@@ -1,7 +1,7 @@
 --------------------------------------------------------------------------------
 --- Settings
 --------------------------------------------------------------------------------
-local opt = vim.opt  -- for conciseness
+local opt = vim.opt -- for conciseness
 
 -- Line numbers, make them relative.
 opt.number = true
@@ -15,18 +15,18 @@ opt.splitright = true
 opt.hlsearch = false
 
 -- Case-insensitive searching UNLESS \C or capital in search
-opt.incsearch  = true
+opt.incsearch = true
 opt.ignorecase = true
-opt.smartcase  = true
+opt.smartcase = true
 
 -- Tabs and indentation
-opt.cindent     = false
-opt.autoindent  = true
+opt.cindent = false
+opt.autoindent = true
 opt.smartindent = true
-opt.tabstop     = 2
+opt.tabstop = 2
 opt.softtabstop = 2
-opt.shiftwidth  = 2
-opt.expandtab   = true
+opt.shiftwidth = 2
+opt.expandtab = true
 
 -- Enable mouse mode
 opt.mouse = 'a'
@@ -52,17 +52,14 @@ opt.colorcolumn = '81,101,121'
 -- Highlight current line
 opt.cursorline = true
 
--- Color theme
-opt.background = "dark"
-
 -- Disable vim folds
 opt.foldenable = false
 
 -- Some globals
-vim.g.python3_host_prog   = '~/miniforge3/bin/python3'
-vim.g.tex_flavor          = 'latex'
+vim.g.python3_host_prog = '~/miniforge3/bin/python3'
+vim.g.tex_flavor = 'latex'
 vim.g.tex_comment_nospell = 1
--- vim.g.tex_nospell      = 1
+-- vim.g.tex_nospell = 1
 
 vim.cmd('set iskeyword-=_')
 
@@ -83,10 +80,10 @@ local keymap = vim.keymap.set
 
 keymap({"n", "v"}, "j", "gj", keyopts)
 keymap({"n", "v"}, "k", "gk", keyopts)
-keymap("v", "<", "<gv", keyopts)                   -- Better indent in visual
-keymap("v", ">", ">gv", keyopts)                   -- Better dedent in visual
-keymap({"i", "v"}, "fd", "<esc>", keyopts)         -- fd = esc in insert
-keymap("t", "<c-f><c-d>", "<c-\\><c-n>", keyopts)  -- <c-f><c-d> = esc in term
+keymap("v", "<", "<gv", keyopts) -- Better indent in visual
+keymap("v", ">", ">gv", keyopts) -- Better dedent in visual
+keymap({"i", "v"}, "fd", "<esc>", keyopts) -- fd = esc in insert
+keymap("t", "<c-f><c-d>", "<c-\\><c-n>", keyopts) -- <c-f><c-d> = esc in term
 keymap("i", "<m-b>", "<c-left>", keyopts)
 keymap("i", "<m-f>", "<c-right>", keyopts)
 keymap("i", "<c-b>", "<left>", keyopts)
@@ -144,11 +141,73 @@ vim.pack.add({
   -- {src = "https://github.com/lewis6991/spaceless.nvim"},
 
   -- File browsing
-  {src = "https://github.com/stevearc/oil.nvim"}
+  {src = "https://github.com/stevearc/oil.nvim"},
+
+  -- Language Server Protocol (LSP)
+  {src = "https://github.com/neovim/nvim-lspconfig"},
+
+  -- Languages
+  {src = "https://github.com/lervag/vimtex"},
 })
 
+--------------------------------------------------------------------------------
+--- Colorscheme
+--------------------------------------------------------------------------------
+
+opt.background = "dark"
+vim.cmd("colorscheme gruvbox")
 
 --------------------------------------------------------------------------------
 --- Oil configuration
 --------------------------------------------------------------------------------
 require("oil").setup()
+
+--------------------------------------------------------------------------------
+--- LSP configuration
+--------------------------------------------------------------------------------
+vim.lsp.enable({"lua_ls", "texlab"})
+
+vim.lsp.config("lua_ls", {
+  settings = {
+    Lua = {
+      workspace = {
+        library = vim.api.nvim_get_runtime_file("", true),
+      }
+    }
+  }
+})
+
+--------------------------------------------------------------------------------
+--- Handling double spaces
+--------------------------------------------------------------------------------
+-- Replace 2+ spaces with a single space if they appear after the first
+-- non-space character in the line (to preserve indentation) when leaving
+-- insert mode, without creating a new undo entry.
+
+-- Main action
+local function squeeze_double_spaces_current_line(bufnr)
+  -- Save/restore view so the cursor and screen don't jump.
+  local view = vim.fn.winsaveview()
+
+  -- Temporarily disable undo recording.
+  local old_undolevels = vim.bo[bufnr].undolevels
+  vim.bo[bufnr].undolevels = -1
+
+  -- Substitution pattern.
+  vim.cmd([[silent! keepjumps keeppatterns %s/\S\zs\s\{2,}/ /ge]])
+
+  -- Restore undo setting and view.
+  vim.bo[bufnr].undolevels = old_undolevels
+  vim.fn.winrestview(view)
+end
+
+-- Set up the autocmd.
+local squeeze_doublespaces_aug = vim.api.nvim_create_augroup(
+  "SqueezeDoubleSpacesOnInsertLeave", { clear = true }
+)
+vim.api.nvim_create_autocmd("InsertLeave", {
+  group = squeeze_doublespaces_aug,
+  callback = function(args)
+    squeeze_double_spaces_current_line(args.buf)
+  end,
+})
