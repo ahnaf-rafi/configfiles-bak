@@ -1,0 +1,20 @@
+# set recolor-darkcolor "#dcdccc"
+# set recolor-lightcolor "#1f1f1f"
+# set recolor true
+
+set database "sqlite"
+
+set adjust-open "width"
+
+set window-title-basename "true"
+set selection-clipboard "clipboard"
+
+set guioptions sv
+set first-page-column 1
+
+set zoom-step 2
+
+set font 'monospace normal 12'
+
+# map <C-o> feedkeys ":exec sh -c \"echo $FILE | xclip -i -r -sel clip\"<Return>"
+# map <C-o> feedkeys ":exec sh -c \"echo $FILE | wl-copy\"<Return>"
