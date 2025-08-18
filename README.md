@@ -1,2 +1,1 @@
-# configfiles
-My configuration files
+# Ahnaf Rafi's configuration files
