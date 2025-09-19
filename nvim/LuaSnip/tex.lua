@@ -150,14 +150,14 @@ return {
 
   ms(
     {{trig = "item"}, {trig = "itemize"}},
-    {t({"\\begin{itemize}", "  \\item "}), i(0), t({"", "\\end{itemize}"})}
+    {t({"\\begin{itemize}", " \\item "}), i(0), t({"", "\\end{itemize}"})}
   ),
 
   s({trig = "it"}, {t({"", "\\item "})}),
 
   ms(
     {{trig = "enum"}, {trig = "enumerate"}},
-    {t({"\\begin{enumerate}", "  \\item "}), i(0), t({"", "\\end{enumerate}"})}
+    {t({"\\begin{enumerate}", " \\item "}), i(0), t({"", "\\end{enumerate}"})}
   ),
 
   s(
@@ -167,22 +167,22 @@ return {
 
   s(
     {trig = "eq"},
-    {t({"\\begin{equation}", "  "}), i(0), t({"", "\\end{equation}"})}
+    {t({"\\begin{equation}", " "}), i(0), t({"", "\\end{equation}"})}
   ),
 
   s(
     {trig = "eqnn"},
-    {t({"\\begin{equation*}", "  "}), i(0), t({"", "\\end{equation*}"})}
+    {t({"\\begin{equation*}", " "}), i(0), t({"", "\\end{equation*}"})}
   ),
 
   s(
     {trig = "al"},
-    {t({"\\begin{align}", "  "}), i(0), t({"", "\\end{align}"})}
+    {t({"\\begin{align}", " "}), i(0), t({"", "\\end{align}"})}
   ),
 
   s(
     {trig = "alnn"},
-    {t({"\\begin{align*}", "  "}), i(0), t({"", "\\end{align*}"})}
+    {t({"\\begin{align*}", " "}), i(0), t({"", "\\end{align*}"})}
   ),
 
   s(
@@ -191,7 +191,7 @@ return {
       isn(
         1,
         {
-          t({"\\begin{split}", "  "}),
+          t({"\\begin{split}", " "}),
           i(1),
           t({"", "\\end{split}"})
         },
@@ -299,6 +299,14 @@ return {
       t({"", "\\end{example}"})
     }
   ),
+  s(
+    {trig = "prob"},
+    {
+      t({"\\begin{problem}", ""}),
+      i(0),
+      t({"", "\\end{problem}"})
+    }
+  ),
 
   -- Frames for beamer
   s(
@@ -323,7 +331,7 @@ return {
         {t("\\frametitle{"), i(1), t({"}", ""})}
       ),
       t({"\\begin{itemize}", ""}),
-      t("  \\item "), i(0),
+      t(" \\item "), i(0),
       t({"", "\\end{itemize}", ""}),
       t("\\end{frame}")
     }

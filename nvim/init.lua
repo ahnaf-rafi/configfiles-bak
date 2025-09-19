@@ -147,6 +147,7 @@ vim.pack.add({
 
   -- Editor
   -- {src = "https://github.com/lewis6991/spaceless.nvim"},
+  {src = "https://github.com/kylechui/nvim-surround"},
 
   -- File browsing
   {src = "https://github.com/stevearc/oil.nvim"},
@@ -154,8 +155,16 @@ vim.pack.add({
   -- Language Server Protocol (LSP)
   {src = "https://github.com/neovim/nvim-lspconfig"},
 
+  -- Treesitter
+  {src = "https://github.com/nvim-treesitter/nvim-treesitter"},
+
+  -- Snippets
+  {src = "https://github.com/L3MON4D3/LuaSnip"},
+
   -- Languages
   {src = "https://github.com/lervag/vimtex"},
+  {src = "https://github.com/chomosuke/typst-preview.nvim"},
+  {src = "https://github.com/R-nvim/R.nvim"}
 })
 
 --------------------------------------------------------------------------------
@@ -164,6 +173,12 @@ vim.pack.add({
 
 opt.background = "dark"
 vim.cmd("colorscheme gruvbox")
+
+
+--------------------------------------------------------------------------------
+--- Editing Plugins
+--------------------------------------------------------------------------------
+require("nvim-surround").setup({})
 
 --------------------------------------------------------------------------------
 --- Oil configuration
@@ -256,7 +271,7 @@ vim.api.nvim_create_autocmd("LspAttach", {
   end
 })
 
-vim.lsp.enable({"lua_ls", "texlab"})
+vim.lsp.enable({"lua_ls", "texlab", "tinymist"})
 
 vim.lsp.config("lua_ls", {
   settings = {
@@ -267,6 +282,99 @@ vim.lsp.config("lua_ls", {
     }
   }
 })
+
+vim.lsp.config("tinymist", {
+  cmd = { "tinymist" },
+  filetypes = { "typst" },
+  settings = {
+    formatterMode = "typstyle",
+    exportPdf = "onType",
+    semanticTokens = "disable"
+  }
+})
+
+--------------------------------------------------------------------------------
+--- Treesitter
+--------------------------------------------------------------------------------
+require("nvim-treesitter.configs").setup({
+  ensure_installed = {
+    -- bash,
+    "bibtex",
+    "git_config",
+    "gitcommit",
+    "gitignore",
+    "julia",
+    -- "latex",
+    "lua",
+    "markdown",
+    "markdown_inline",
+    "r",
+    "rnoweb",
+    "vim",
+    "vimdoc",
+    "yaml"
+  },
+  sync_install = true,
+  highlight = {
+    enable = true,
+    -- disable = { "julia" },
+    -- disable = { "latex" },
+  },
+  indent = { enable = true },
+  ignore_install = {},
+  auto_install = false,
+  modules = {},
+})
+
+--------------------------------------------------------------------------------
+--- Snippets
+--------------------------------------------------------------------------------
+require("luasnip").setup({
+  enable_autosnippets = true,
+  store_selection_keys = "<Tab>",
+})
+require("luasnip.loaders.from_lua").lazy_load({
+  paths = "~/.config/nvim/LuaSnip/"
+})
+
+vim.cmd[[
+" press <Tab> to expand or jump in a snippet.
+" These can also be mapped separately via <Plug>luasnip-expand-snippet and
+" <Plug>luasnip-jump-next.
+imap <silent><expr> <Tab> luasnip#expand_or_jumpable() ? '<Plug>luasnip-expand-or-jump' : '<Tab>'
+snoremap <silent> <Tab> <cmd>lua require('luasnip').jump(1)<Cr>
+
+" Use Shift-Tab to jump backwards through snippets (that's what the -1 is for)
+inoremap <silent> <S-Tab> <cmd>lua require'luasnip'.jump(-1)<Cr>
+snoremap <silent> <S-Tab> <cmd>lua require('luasnip').jump(-1)<Cr>
+
+" For changing choices in choiceNodes (not strictly necessary for a basic setup).
+imap <silent><expr> <C-E> luasnip#choice_active() ? '<Plug>luasnip-next-choice' : '<C-E>'
+smap <silent><expr> <C-E> luasnip#choice_active() ? '<Plug>luasnip-next-choice' : '<C-E>'
+
+" Use Tab to expand and jump through snippets
+"imap <silent><expr> <Tab> luasnip#expand_or_jumpable() ? '<Plug>luasnip-expand-or-jump' : '<Tab>'
+"smap <silent><expr> <Tab> luasnip#jumpable(1) ? '<Plug>luasnip-jump-next' : '<Tab>'
+
+"" Use Shift-Tab to jump backwards through snippets
+"imap <silent><expr> <S-Tab> luasnip#jumpable(-1) ? '<Plug>luasnip-jump-prev' : '<S-Tab>'
+"smap <silent><expr> <S-Tab> luasnip#jumpable(-1) ? '<Plug>luasnip-jump-prev' : '<S-Tab>'
+]]
+
+--------------------------------------------------------------------------------
+--- Typst
+--------------------------------------------------------------------------------
+
+vim.api.nvim_create_user_command("OpenPdf", function()
+  local filepath = vim.api.nvim_buf_get_name(0)
+  if filepath:match("%.typ$") then
+    local pdf_path = filepath:gsub("%.typ$", ".pdf")
+    vim.system(
+      --- { "open", pdf_path }
+      { "zathura", pdf_path }
+    )
+  end
+end, {})
 
 --------------------------------------------------------------------------------
 --- Vimtex
@@ -346,6 +454,45 @@ g.vimtex_toc_config = {
 }
 
 --------------------------------------------------------------------------------
+--- R.nvim
+--------------------------------------------------------------------------------
+-- Create a table with the options to be passed to setup()
+---@type RConfigUserOpts
+local opts = {
+  -- hook = {
+  -- on_filetype = function()
+  -- vim.api.nvim_buf_set_keymap(0, "n", "<Enter>", "<Plug>RDSendLine", {})
+  -- vim.api.nvim_buf_set_keymap(0, "v", "<Enter>", "<Plug>RSendSelection", {})
+  -- end
+  -- },
+  R_args = {"--quiet", "--no-save"},
+  -- min_editor_width = 72,
+  -- rconsole_width = 78,
+  -- objbr_mappings = { -- Object browser keymap
+  -- c = 'class', -- Call R functions
+  -- ['<localleader>gg'] = 'head({object}, n = 15)', -- Use {object} notation to write arbitrary R code.
+  -- v = function()
+  -- -- Run lua functions
+  -- require('r.browser').toggle_view()
+  -- end
+  -- },
+  -- disable_cmds = {
+  -- "RClearConsole",
+  -- "RCustomStart",
+  -- "RSPlot",
+  -- "RSaveClose",
+  -- },
+}
+-- Check if the environment variable "R_AUTO_START" exists.
+-- If using fish shell, you could put in your config.fish:
+-- alias r "R_AUTO_START=true nvim"
+if vim.env.R_AUTO_START == "true" then
+  opts.auto_start = "on startup"
+  opts.objbr_auto_start = true
+end
+require("r").setup(opts)
+
+--------------------------------------------------------------------------------
 --- Handling double spaces
 --------------------------------------------------------------------------------
 -- Replace 2+ spaces with a single space if they appear after the first
@@ -354,19 +501,19 @@ g.vimtex_toc_config = {
 
 -- Main action
 local function squeeze_double_spaces(bufnr)
--- Save/restore view so the cursor and screen don't jump.
-local view = vim.fn.winsaveview()
+  -- Save/restore view so the cursor and screen don't jump.
+  local view = vim.fn.winsaveview()
 
--- Temporarily disable undo recording.
-local old_undolevels = vim.bo[bufnr].undolevels
-vim.bo[bufnr].undolevels = -1
+  -- Temporarily disable undo recording.
+  local old_undolevels = vim.bo[bufnr].undolevels
+  vim.bo[bufnr].undolevels = -1
 
--- Substitution pattern.
-vim.cmd([[silent! keepjumps keeppatterns %s/\S\zs\s\{2,}/ /ge]])
+  -- Substitution pattern.
+  vim.cmd([[silent! keepjumps keeppatterns %s/\S\zs\s\{2,}/ /ge]])
 
--- Restore undo setting and view.
-vim.bo[bufnr].undolevels = old_undolevels
-vim.fn.winrestview(view)
+  -- Restore undo setting and view.
+  vim.bo[bufnr].undolevels = old_undolevels
+  vim.fn.winrestview(view)
 end
 
 -- Set up the autocmd.
