@@ -1,54 +1,67 @@
 {
-  description = "Ahnaf Rafi's nix-darwin and Home Manager Configuration";
+  description = "Ahnaf Rafi's dotfiles with nix-darwin and home-manager";
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
-
-    nix-darwin = {
-      url = "github:nix-darwin/nix-darwin/master";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-
-    home-manager = {
-      url = "github:nix-community/home-manager";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-
+    nix-darwin.url = "github:nix-darwin/nix-darwin/master";
+    nix-darwin.inputs.nixpkgs.follows = "nixpkgs";
+    home-manager.url = "github:nix-community/home-manager";
+    home-manager.inputs.nixpkgs.follows = "nixpkgs";
     nix-homebrew.url = "github:zhaofengli/nix-homebrew";
     homebrew-core = { url = "github:homebrew/homebrew-core"; flake = false; };
     homebrew-cask = { url = "github:homebrew/homebrew-cask"; flake = false; };
-
     neovim-nightly-overlay.url = "github:nix-community/neovim-nightly-overlay";
-
   };
 
   outputs = {
     self, nixpkgs, nix-darwin, home-manager,
-    nix-homebrew, homebrew-core, homebrew-cask, ...
+    nix-homebrew, homebrew-core, homebrew-cask,
+    neovim-nightly-overlay, ...
     }:
 
     let
       configuration = { pkgs, config, ... }: {
         nixpkgs.config.allowUnfree = true;
 
+        # UNCOMMENT WHEN THE OTHER SCRIPTS ARE WRITTEN
+        # Import modular configurations
+        # imports = [
+        #   ./modules/system.nix
+        #   ./modules/homebrew.nix
+        #   ./modules/fonts.nix
+        #   ./modules/programs/git.nix
+        #   ./modules/programs/zsh.nix
+        # ];
+
         # List packages installed in system profile. To search by name, run:
         # $ nix-env -qaP | grep wget
         environment.systemPackages = [
           pkgs.coreutils
+          pkgs.vim
+          pkgs.neovim
+          pkgs.tmux
+          pkgs.git
           pkgs.fontconfig
+          pkgs.ripgrep
+          pkgs.fd
+          pkgs.fzf
           pkgs.cargo
           pkgs.nodejs
-          pkgs.neovim
           pkgs.tree-sitter
-          pkgs.mkalias
           pkgs.wezterm
-          pkgs.emacs
-          # pkgs.tmux
+          pkgs.ghostty
+          # pkgs.mkalias
+          # pkgs.emacs
         ];
         fonts.packages = [
           pkgs.julia-mono
         ];
+
+        # Necessary for using flakes on this system
         nix.settings.experimental-features = "nix-command flakes";
+
+
+        # Create /etc/zshrc that loads the nix-darwin environment
         programs.zsh.enable = true;
 
         system.keyboard = {
