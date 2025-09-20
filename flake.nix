@@ -25,12 +25,6 @@
       specialArgs = inputs;
       modules = [ 
         ./hosts/mb-air-work
-        home-manager.darwinModules.home-manager {
-          # home-manager config
-          home-manager.useGlobalPkgs = true;
-          home-manager.useUserPackages = true;
-          home-manager.users.ahnafrafi = import ./home/home.nix;
-        }
       ];
     };
   };

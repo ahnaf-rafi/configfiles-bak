@@ -1,9 +1,9 @@
 { inputs, pkgs, ... }:
-let
-  inherit (inputs) nixpkgs;
-in
+# let
+# inherit (inputs) nixpkgs;
+# in
 {
-  nixpkgs.config.allowUnfree = true;
+  inputs.nixpkgs.config.allowUnfree = true;
 
   # Necessary for using flakes on this system.
   nix.settings.experimental-features = "nix-command flakes";
@@ -29,8 +29,18 @@ in
     wget
     stow 
 
+    bat
+    exa
+    fd
+    ripgrep
+    fzf
+    tmux
+    lazygit
+    delta
+    gh
+
     # Terminal emulator
-    # ghostty
+    ghostty
     wezterm
   ];
 
@@ -39,6 +49,11 @@ in
     julia-mono
     nerd-fonts.jetbrains-mono
   ];
+
+  programs.neovim = {
+    enable = true;
+    package = inputs.neovim-nightly-overlay.packages.${pkgs.system}.default;
+  };
 
   users.users.ahnafrafi = {
     name = "ahnafrafi";
