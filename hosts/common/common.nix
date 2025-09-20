@@ -9,15 +9,10 @@ in
   nix.settings.experimental-features = "nix-command flakes";
 
   # programs.fish.enable = true;
-  programs.zsh = {
-    enable = true;
-    enableBashCompletion = true;
-    autosuggestions.enable = true;
-    syntaxHighlighting.enable = true;
-  };
+  programs.zsh.enable = true;
 
   # Set Git commit hash for darwin-version.
-  system.configurationRevision = self.rev or self.dirtyRev or null;
+  system.configurationRevision = inputs.self.rev or inputs.self.dirtyRev or null;
 
   # Used for backwards compatibility, please read the changelog before changing.
   # $ darwin-rebuild changelog
@@ -35,7 +30,8 @@ in
     stow 
 
     # Terminal emulator
-    ghostty
+    # ghostty
+    wezterm
   ];
 
   # Fonts
@@ -43,4 +39,9 @@ in
     julia-mono
     nerd-fonts.jetbrains-mono
   ];
+
+  users.users.ahnafrafi = {
+    name = "ahnafrafi";
+    home = /Users/ahnafrafi;
+  };
 }

@@ -22,6 +22,7 @@
     # Build darwin flake using:
     # $ darwin-rebuild build --flake .#mb-air-work
     darwinConfigurations."mb-air-work" = nix-darwin.lib.darwinSystem {
+      specialArgs = inputs;
       modules = [ 
         ./hosts/mb-air-work
         home-manager.darwinModules.home-manager {

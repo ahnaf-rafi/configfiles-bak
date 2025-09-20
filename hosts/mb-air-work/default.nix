@@ -1,4 +1,4 @@
-{ inputs, pkgs, ...}
+{ inputs, pkgs, ...}:
 let
   inherit (inputs) nixpkgs;
 in
@@ -9,5 +9,5 @@ in
   imports = [
     ../common/common.nix
     ../common/darwin-common.nix
-  ]
+  ];
 }

@@ -1,7 +1,8 @@
-{ inputs, pkgs, ... }:
+{ inputs, config, pkgs, ... }:
 {
   # Using Determinate Nix.
   nix.enable = false; 
+  system.primaryUser = "ahnafrafi";
 
   system.defaults = {
     NSGlobalDomain.AppleICUForce24HourTime = true;
