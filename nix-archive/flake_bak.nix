@@ -17,26 +17,26 @@
     self, nixpkgs, nix-darwin, home-manager,
     nix-homebrew, homebrew-core, homebrew-cask,
     neovim-nightly-overlay, ...
-    }:
+  }:
 
-    let
-      configuration = { pkgs, config, ... }: {
-        nixpkgs.config.allowUnfree = true;
+  let
+    configuration = { pkgs, config, ... }: {
+      nixpkgs.config.allowUnfree = true;
 
-        # UNCOMMENT WHEN THE OTHER SCRIPTS ARE WRITTEN
-        # Import modular configurations
-        # imports = [
-        #   ./modules/system.nix
-        #   ./modules/homebrew.nix
-        #   ./modules/fonts.nix
-        #   ./modules/programs/git.nix
-        #   ./modules/programs/zsh.nix
-        # ];
+# UNCOMMENT WHEN THE OTHER SCRIPTS ARE WRITTEN
+# Import modular configurations
+# imports = [
+#   ./modules/system.nix
+#   ./modules/homebrew.nix
+#   ./modules/fonts.nix
+#   ./modules/programs/git.nix
+#   ./modules/programs/zsh.nix
+# ];
 
-        # List packages installed in system profile. To search by name, run:
-        # $ nix-env -qaP | grep wget
-        environment.systemPackages = [
-          pkgs.coreutils
+# List packages installed in system profile. To search by name, run:
+# $ nix-env -qaP | grep wget
+      environment.systemPackages = [
+        pkgs.coreutils
           pkgs.vim
           pkgs.neovim
           pkgs.tmux
@@ -51,30 +51,30 @@
           pkgs.tree-sitter
           pkgs.wezterm
           pkgs.ghostty
-          # pkgs.mkalias
-          # pkgs.emacs
-        ];
-        fonts.packages = [
-          pkgs.julia-mono
-        ];
+# pkgs.mkalias
+# pkgs.emacs
+      ];
+      fonts.packages = [
+        pkgs.julia-mono
+      ];
 
-        # Necessary for using flakes on this system
-        nix.settings.experimental-features = "nix-command flakes";
+# Necessary for using flakes on this system
+      nix.settings.experimental-features = "nix-command flakes";
 
 
-        # Create /etc/zshrc that loads the nix-darwin environment
-        programs.zsh.enable = true;
+# Create /etc/zshrc that loads the nix-darwin environment
+      programs.zsh.enable = true;
 
-        system.keyboard = {
-          enableKeyMapping = true;
-          remapCapsLockToControl = true;
-        };
+      system.keyboard = {
+        enableKeyMapping = true;
+        remapCapsLockToControl = true;
+      };
 
-        # Set Git commit hash for darwin-version.
-        system.configurationRevision = self.rev or self.dirtyRev or null;
+# Set Git commit hash for darwin-version.
+      system.configurationRevision = self.rev or self.dirtyRev or null;
 
-        system.activationScripts.applications.text = let
-          env = pkgs.buildEnv {
+      system.activationScripts.applications.text = let
+        env = pkgs.buildEnv {
             name = "system-applications";
             paths = config.environment.systemPackages;
             Applications = "/pathsToLink";
