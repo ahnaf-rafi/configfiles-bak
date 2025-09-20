@@ -6,8 +6,8 @@
     ./programs/neovim.nix
     ./programs/tmux.nix
     ./programs/git.nix
-    ./programs/fzf.nix
-    ./programs/zhs.nix
+    # ./programs/fzf.nix
+    ./programs/zsh.nix
   ];
 
   # macOS-specific home configuration

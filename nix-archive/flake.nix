@@ -40,7 +40,7 @@
         system = "aarch64-darwin"; # or x86_64-darwin
         modules = [
           ./hosts/darwin-common.nix
-          ./hosts/work-macbook-air
+          ./hosts/mb-air-work
           home-manager.darwinModules.home-manager
           {
             home-manager.useGlobalPkgs = true;

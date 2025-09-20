@@ -1,7 +1,7 @@
 { config, pkgs, ... }:
 
 {
-  programs.git = {
+  programs.zsh = {
     enable = true;
     enableAutosuggestions = true;
     enableCompletion = true;

@@ -15,11 +15,10 @@
   # Enable nix flakes
   nix.settings.experimental-features = [ "nix-command" "flakes" ];
 
-  # Overlay for neovim nightly
-  nixpkgs.overlays = [
-    inputs.neovim-nightly-overlay.overlay
-  ];
-
+  # # Overlay for neovim nightly
+  # nixpkgs.overlays = [
+  #   inputs.neovim-nightly-overlay.overlay
+  # ];
 
   # Auto upgrade nix package and the daemon service
   services.nix-daemon.enable = true;
