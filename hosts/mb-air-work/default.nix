@@ -3,13 +3,13 @@
 {
   imports = [
     ../common.nix
+    ../darwin-common.nix
   ];
 
   # Host-specific system packages
-  environment.systemPackages = [
+  environment.systemPackages = with pkgs; [
     # Add packages specific to this machine
     # Example: docker-desktop, specific development tools
-    pkgs.google-chrome
   ];
 
   # Host-specific settings
