@@ -2,7 +2,8 @@
   description = "Ahnaf Rafi's nix configuration";
 
   inputs = {
-    nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
+    nixpkgs.url = "github:NixOS/nixpkgs/nixos-25.05";
+    nixpkgs-unstable.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
     nix-darwin.url = "github:nix-darwin/nix-darwin/master";
     nix-darwin.inputs.nixpkgs.follows = "nixpkgs";
     home-manager.url = "github:nix-community/home-manager";
@@ -14,7 +15,7 @@
   };
 
   outputs = inputs@{
-    self, nix-darwin, nixpkgs, home-manager, neovim-nightly, 
+    self, nix-darwin, nixpkgs, nixpkgs-unstable, home-manager, neovim-nightly, 
     nix-homebrew, homebrew-core, homebrew-cask,
   }:
 
