@@ -1,6 +1,3 @@
-  outputs = {
-    }@inputs:{
-
 {
   description = "Ahnaf Rafi's dotfiles with nix-darwin and home-manager";
 
