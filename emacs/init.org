@@ -124,6 +124,7 @@ a ~:defer t~ keyword argument.
 This block instead asks deferral to be the default and so, any package required
 on startup must be marked by a ~:demand t~ keyword argument.
 #+begin_src emacs-lisp
+(setq use-package-always-ensure t)
 (setq use-package-always-defer t)
 
 (require 'use-package)
