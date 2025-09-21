@@ -30,7 +30,8 @@
         pkgs.ripgrep
         pkgs.fzf
         pkgs.wezterm
-
+        pkgs.lazygit
+        pkgs.delta
         pkgs.emacs-pgtk
 
         neovim-nightly.packages.${pkgs.system}.default

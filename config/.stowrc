@@ -1,5 +1,3 @@
 --target=~/.config
 --ignore=.stowrc
 --ignore=.DS_Store
---ignore=flake.nix
---ignore=flake.lock

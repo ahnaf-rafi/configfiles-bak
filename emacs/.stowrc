@@ -1,0 +1,4 @@
+--target=~/.emacs.d
+--ignore=init.org
+--ignore=.stowrc
+--ignore=.DS_Store
