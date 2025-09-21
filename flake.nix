@@ -6,9 +6,21 @@
     nix-darwin.url = "github:nix-darwin/nix-darwin/master";
     nix-darwin.inputs.nixpkgs.follows = "nixpkgs";
     neovim-nightly.url = "github:nix-community/neovim-nightly-overlay";
+    nix-homebrew.url = "github:zhaofengli/nix-homebrew";
+    homebrew-core = {
+      url = "github:homebrew/homebrew-core";
+      flake = false;
+    };
+    homebrew-cask = {
+      url = "github:homebrew/homebrew-cask";
+      flake = false;
+    };
   };
 
-  outputs = inputs@{ self, nixpkgs, nix-darwin, neovim-nightly }:
+  outputs = inputs@{
+    self, nixpkgs, nix-darwin, neovim-nightly,
+    nix-homebrew, homebrew-core, homebrew-cask
+  }:
   let
     configuration = { pkgs, ... }: {
       nix.enable = false;
@@ -81,7 +93,38 @@
     # Build darwin flake using:
     # $ darwin-rebuild build --flake .#mb-air-work
     darwinConfigurations."mb-air-work" = nix-darwin.lib.darwinSystem {
-      modules = [ configuration ];
+      modules = [ 
+        configuration
+        nix-homebrew.darwinModules.nix-homebrew {
+          nix-homebrew = {
+            # Install Homebrew under the default prefix
+            enable = true;
+
+            # Apple Silicon Only: Also install Homebrew under the default Intel
+            # prefix for Rosetta 2
+            enableRosetta = true;
+
+            # User owning the Homebrew prefix
+            user = "ahnafrafi";
+
+            # Optional: Declarative tap management
+            taps = {
+              "homebrew/homebrew-core" = homebrew-core;
+              "homebrew/homebrew-cask" = homebrew-cask;
+            };
+
+            # Optional: Enable fully-declarative tap management
+            #
+            # With mutableTaps disabled, taps can no longer be added
+            # imperatively with `brew tap`.
+            mutableTaps = false;
+          };
+        }
+        # Optional: Align homebrew taps config with nix-homebrew
+        ({config, ...}: {
+         homebrew.taps = builtins.attrNames config.nix-homebrew.taps;
+        })
+      ];
     };
   };
 }
