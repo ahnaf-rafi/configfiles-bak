@@ -16,7 +16,7 @@
 
       # List packages installed in system profile. To search by name, run:
       # $ nix-env -qaP | grep wget
-      environment.systemPackages = [ 
+      environment.systemPackages = [
         pkgs.vim
         pkgs.git
         pkgs.curl
@@ -55,9 +55,21 @@
       # Set Git commit hash for darwin-version.
       system.configurationRevision = self.rev or self.dirtyRev or null;
 
-      # Used for backwards compatibility, please read the changelog before changing.
+      # Used for backwards compatibility, please read the changelog before
+      # changing.
       # $ darwin-rebuild changelog
       system.stateVersion = 6;
+
+      system.defaults = {
+        dock.autohide = true;
+        finder.FXPreferredViewStyle = "clmv";
+        NSGlobalDomain.AppleShowAllExtensions = true;
+      };
+
+      system.keyboard = {
+        enableKeyMapping = true;
+        remapCapsLockToControl = true;
+      };
 
       # The platform the configuration will be used on.
       nixpkgs.hostPlatform = "aarch64-darwin";
