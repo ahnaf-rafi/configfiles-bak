@@ -17,23 +17,21 @@
       # List packages installed in system profile. To search by name, run:
       # $ nix-env -qaP | grep wget
       environment.systemPackages = [ 
-	pkgs.vim
-	pkgs.git
-	pkgs.curl
-	pkgs.wget
-	pkgs.stow
+        pkgs.vim
+        pkgs.git
+        pkgs.curl
+        pkgs.wget
+        pkgs.stow
         pkgs.tmux
-
         pkgs.fontconfig
-        
         pkgs.eza
         pkgs.bat
         pkgs.fd
         pkgs.ripgrep
-
         pkgs.fzf
-
         pkgs.wezterm
+
+        pkgs.emacs-pgtk
 
         neovim-nightly.packages.${pkgs.system}.default
       ];
@@ -43,8 +41,8 @@
       ];
 
       # programs.neovim = {
-      #   enable = true;
-      #   package = inputs.neovim-nightly.packages.${pkgs.system}.default;
+      # enable = true;
+      # package = inputs.neovim-nightly.packages.${pkgs.system}.default;
       # };
 
       # Necessary for using flakes on this system.
