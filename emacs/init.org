@@ -1142,9 +1142,10 @@ DIR must include a .project file to be considered a project."
 (use-package consult-eglot)
 #+end_src
 
-** ~treesit~
-#+begin_src emacs-lisp
-(use-package treesit)
+** TODO ~treesit~
+I need to check if I actually have to declare ~treesit~ throught ~use-package~.
+#+begin_src emacs-lisp :tangle no
+;; (use-package treesit)
 #+end_src
 
 ** ~treesit-auto~
@@ -1517,7 +1518,7 @@ with ~matlab~ source code.
 (use-package websocket)
 
 (use-package typst-preview
-  :load-path "~/.emacs.d/lisp/typst-preview.el"
+  :vc (:url "https://github.com/havarddj/typst-preview.el" :branch "main" :rev :rewest)
   :init
   (require 'typst-preview)
   ;; default is "default"

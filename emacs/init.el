@@ -814,8 +814,6 @@ DIR must include a .project file to be considered a project."
 
 (use-package consult-eglot)
 
-(use-package treesit)
-
 (use-package treesit-auto
   :demand t
   :config
@@ -1105,7 +1103,7 @@ method to prepare vterm at the corresponding remote directory."
 (use-package websocket)
 
 (use-package typst-preview
-  :load-path "~/.emacs.d/lisp/typst-preview.el"
+  :vc (:url "https://github.com/havarddj/typst-preview.el" :branch "main" :rev :rewest)
   :init
   (require 'typst-preview)
   ;; default is "default"
