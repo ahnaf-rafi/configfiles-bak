@@ -44,6 +44,21 @@
         pkgs.libpng
         pkgs.zlib
         pkgs.poppler
+        (pkgs.texlive.combine {
+          inherit (pkgs.texlive)
+          scheme-basic 
+          biber
+          amsmath
+          graphics
+          hyperref
+          tcolorbox;
+        })
+        pkgs.texlab
+        pkgs.typst
+        pkgs.tinymist
+        pkgs.zathura
+        pkgs.skim
+
         pkgs.eza
         pkgs.bat
         pkgs.fd
