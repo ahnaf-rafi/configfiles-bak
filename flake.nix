@@ -36,6 +36,14 @@
         pkgs.stow
         pkgs.tmux
         pkgs.fontconfig
+        pkgs.automake
+        pkgs.autoconf
+        pkgs.autogen
+        pkgs.gcc
+        pkgs.gnumake
+        pkgs.libpng
+        pkgs.zlib
+        pkgs.poppler
         pkgs.eza
         pkgs.bat
         pkgs.fd
