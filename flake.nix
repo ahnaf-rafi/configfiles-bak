@@ -71,7 +71,7 @@
         pkgs.lazygit
         pkgs.delta
         ((pkgs.emacsPackagesFor pkgs.emacs-pgtk).emacsWithPackages (
-          epkgs: [ epkgs.vterm epkgs.pdf-tools ]
+          epkgs: [ epkgs.vterm epkgs.pdf-tools epkgs.auctex ]
         ))
 
 
