@@ -1,78 +1,33 @@
 {
-  description = "Ahnaf Rafi's dotfiles with nix-darwin and home-manager";
+  description = "Ahnaf Rafi's nix configuration";
 
   inputs = {
-    nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
-    darwin.url = "github:nix-darwin/nix-darwin/master";
-    darwin.inputs.nixpkgs.follows = "nixpkgs";
+    # nixpkgs.url = "github:NixOS/nixpkgs/nixos-25.05";
+    nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-25.05-darwin";
+    nixpkgs-unstable.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
+    nix-darwin.url = "github:nix-darwin/nix-darwin/nix-darwin-25.05";
+    nix-darwin.inputs.nixpkgs.follows = "nixpkgs";
     home-manager.url = "github:nix-community/home-manager";
     home-manager.inputs.nixpkgs.follows = "nixpkgs";
+    neovim-nightly.url = "github:nix-community/neovim-nightly-overlay";
     nix-homebrew.url = "github:zhaofengli/nix-homebrew";
     homebrew-core = { url = "github:homebrew/homebrew-core"; flake = false; };
     homebrew-cask = { url = "github:homebrew/homebrew-cask"; flake = false; };
-    neovim-nightly-overlay.url = "github:nix-community/neovim-nightly-overlay";
   };
 
-  outputs = {
-    self, nixpkgs, darwin, home-manager,
+  outputs = inputs@{
+    self, nix-darwin, nixpkgs, nixpkgs-unstable, home-manager, neovim-nightly, 
     nix-homebrew, homebrew-core, homebrew-cask,
-    neovim-nightly-overlay, ...
-  }@inputs: {
-    # macOS configurations
-    darwinConfigurations = {
+  }:
 
-      # "macbook-pro" = darwin.lib.darwinSystem {
-      #   system = "aarch64-darwin"; # or x86_64-darwin
-      #   modules = [
-      #     ./hosts/darwin-common.nix
-      #     ./hosts/macbook-pro
-      #     home-manager.darwinModules.home-manager
-      #     {
-      #       home-manager.useGlobalPkgs = true;
-      #       home-manager.useUserPackages = true;
-      #       home-manager.users.yourusername = import ./home/darwin.nix;
-      #     }
-      #   ];
-      #   specialArgs = { inherit inputs; };
-      # };
-
-      "mb-air-work" = darwin.lib.darwinSystem {
-        system = "aarch64-darwin"; # or x86_64-darwin
-        modules = [
-          ./hosts/darwin-common.nix
-          ./hosts/mb-air-work
-          home-manager.darwinModules.home-manager
-          {
-            home-manager.useGlobalPkgs = true;
-            home-manager.useUserPackages = true;
-            home-manager.users.yourusername = import ./home/darwin.nix;
-            # Work-specific home manager settings
-            home-manager.extraSpecialArgs = {
-              inherit inputs;
-              isWorkMachine = true;
-            };
-          }
-        ];
-        specialArgs = { inherit inputs; };
-      };
+  {
+    # Build darwin flake using:
+    # $ darwin-rebuild build --flake .#mb-air-work
+    darwinConfigurations."mb-air-work" = nix-darwin.lib.darwinSystem {
+      specialArgs = inputs;
+      modules = [ 
+        ./hosts/mb-air-work
+      ];
     };
-
-    # # Future NixOS configuration
-    # nixosConfigurations = {
-    #   "nixos-workstation" = nixpkgs.lib.nixosSystem {
-    #     system = "x86_64-linux";
-    #     modules = [
-    #       ./hosts/nixos-workstation
-    #       home-manager.nixosModules.home-manager
-    #       {
-    #         home-manager.useGlobalPkgs = true;
-    #         home-manager.useUserPackages = true;
-    #         home-manager.users.ahnafrafi = import ./home/linux.nix;
-    #       }
-    #     ];
-    #     specialArgs = { inherit inputs; };
-    #   };
-    # };
-
   };
 }

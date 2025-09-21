@@ -1,41 +1,26 @@
 {
-  description = "Ahnaf Rafi's dotfiles with nix-darwin and home-manager";
+  description = "Example nix-darwin system flake";
 
   inputs = {
-    nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
-    nix-darwin.url = "github:nix-darwin/nix-darwin/master";
+    nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-25.05-darwin";
+    nix-darwin.url = "github:nix-darwin/nix-darwin/nix-darwin-25.05";
     nix-darwin.inputs.nixpkgs.follows = "nixpkgs";
-    neovim-nightly.url = "github:nix-community/neovim-nightly-overlay";
   };
 
-  outputs = inputs@{ self, nixpkgs, nix-darwin, neovim-nightly }:
+  outputs = inputs@{ self, nix-darwin, nixpkgs }:
   let
     configuration = { pkgs, ... }: {
-      nix.enable = false;
-      nixpkgs.config.allowUnfree = true;
-
       # List packages installed in system profile. To search by name, run:
       # $ nix-env -qaP | grep wget
-      environment.systemPackages = [ 
-	pkgs.vim
-	pkgs.git
-	pkgs.curl
-	pkgs.wget
-	pkgs.stow
-
-        neovim-nightly.packages.${pkgs.system}.default
-      ];
-
-      # programs.neovim = {
-      #   enable = true;
-      #   package = inputs.neovim-nightly.packages.${pkgs.system}.default;
-      # };
+      environment.systemPackages =
+        [ pkgs.vim
+        ];
 
       # Necessary for using flakes on this system.
       nix.settings.experimental-features = "nix-command flakes";
 
       # Enable alternative shell support in nix-darwin.
-      programs.zsh.enable = true;
+      # programs.fish.enable = true;
 
       # Set Git commit hash for darwin-version.
       system.configurationRevision = self.rev or self.dirtyRev or null;
@@ -50,8 +35,8 @@
   in
   {
     # Build darwin flake using:
-    # $ darwin-rebuild build --flake .#mb-air-work
-    darwinConfigurations."mb-air-work" = nix-darwin.lib.darwinSystem {
+    # $ darwin-rebuild build --flake .#simple
+    darwinConfigurations."simple" = nix-darwin.lib.darwinSystem {
       modules = [ configuration ];
     };
   };
