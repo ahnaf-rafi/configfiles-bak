@@ -60,7 +60,7 @@
       # $ darwin-rebuild changelog
       system.stateVersion = 6;
 
-      system.primaryUser = "ahnafrafi"
+      system.primaryUser = "ahnafrafi";
 
       system.defaults = {
         dock.autohide = true;
