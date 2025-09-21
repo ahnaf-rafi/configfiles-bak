@@ -45,6 +45,7 @@
         pkgs.libpng
         pkgs.zlib
         pkgs.poppler
+        pkgs.aspell
         (pkgs.texlive.combine {
           inherit (pkgs.texlive)
           scheme-basic
@@ -75,8 +76,9 @@
           epkgs: [ epkgs.vterm epkgs.pdf-tools epkgs.auctex ]
         ))
 
-
         neovim-nightly.packages.${pkgs.system}.default
+
+        pkgs.maestral
       ];
 
       fonts.packages = [
