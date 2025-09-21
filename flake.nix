@@ -22,8 +22,24 @@
 	pkgs.curl
 	pkgs.wget
 	pkgs.stow
+        pkgs.tmux
+
+        pkgs.fontconfig
+        
+        pkgs.eza
+        pkgs.bat
+        pkgs.fd
+        pkgs.ripgrep
+
+        pkgs.fzf
+
+        pkgs.wezterm
 
         neovim-nightly.packages.${pkgs.system}.default
+      ];
+
+      fonts.packages = [
+        pkgs.julia-mono
       ];
 
       # programs.neovim = {
