@@ -46,7 +46,7 @@
         pkgs.poppler
         (pkgs.texlive.combine {
           inherit (pkgs.texlive)
-          scheme-basic 
+          scheme-basic
           biber
           amsmath
           graphics
@@ -56,8 +56,11 @@
         pkgs.texlab
         pkgs.typst
         pkgs.tinymist
+        pkgs.skimpdf
         pkgs.zathura
-        pkgs.skim
+        (pkgs.zathura.override {
+          plugins = with pkgs.zathuraPkgs; [ zathura_pdf_mupdf ];
+        })
 
         pkgs.eza
         pkgs.bat
@@ -68,6 +71,10 @@
         pkgs.lazygit
         pkgs.delta
         pkgs.emacs-pgtk
+        ((pkgs.emacsPackagesFor pkgs.emacs-pgtk).emacsWithPackages (
+          epkgs: [ epkgs.vterm epkgs.pdftools ]
+        ))
+
 
         neovim-nightly.packages.${pkgs.system}.default
       ];
@@ -116,7 +123,7 @@
     # Build darwin flake using:
     # $ darwin-rebuild build --flake .#mb-air-work
     darwinConfigurations."mb-air-work" = nix-darwin.lib.darwinSystem {
-      modules = [ 
+      modules = [
         configuration
         nix-homebrew.darwinModules.nix-homebrew {
           nix-homebrew = {
