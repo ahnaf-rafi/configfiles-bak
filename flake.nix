@@ -72,7 +72,7 @@
         pkgs.delta
         pkgs.emacs-pgtk
         ((pkgs.emacsPackagesFor pkgs.emacs-pgtk).emacsWithPackages (
-          epkgs: [ epkgs.vterm epkgs.pdftools ]
+          epkgs: [ epkgs.vterm epkgs.pdf-tools ]
         ))
 
 
