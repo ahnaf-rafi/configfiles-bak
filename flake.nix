@@ -44,25 +44,6 @@
         pkgs.gnumake
         pkgs.libpng
         pkgs.zlib
-        pkgs.poppler
-        pkgs.aspell
-        (pkgs.texlive.combine {
-          inherit (pkgs.texlive)
-          scheme-basic
-          biber
-          amsmath
-          graphics
-          hyperref
-          tcolorbox;
-        })
-        pkgs.texlab
-        pkgs.typst
-        pkgs.tinymist
-        pkgs.skimpdf
-        pkgs.zathura
-        (pkgs.zathura.override {
-          plugins = with pkgs.zathuraPkgs; [ zathura_pdf_mupdf ];
-        })
 
         pkgs.eza
         pkgs.bat
@@ -75,10 +56,31 @@
         ((pkgs.emacsPackagesFor pkgs.emacs-pgtk).emacsWithPackages (
           epkgs: [ epkgs.vterm epkgs.pdf-tools epkgs.auctex ]
         ))
-
         neovim-nightly.packages.${pkgs.system}.default
 
+        (pkgs.texlive.combine {
+          inherit (pkgs.texlive)
+          scheme-basic
+          biber
+          amsmath
+          graphics
+          hyperref
+          tcolorbox;
+        })
+        pkgs.texlab
+        pkgs.typst
+        pkgs.tinymist
+        pkgs.R
+        pkgs.rstudio
+
         pkgs.maestral
+        pkgs.aspell
+        pkgs.skimpdf
+        pkgs.zathura
+        (pkgs.zathura.override {
+          plugins = [ pkgs.zathuraPkgs.zathura_pdf_mupdf ];
+        })
+        pkgs.rectangle
       ];
 
       fonts.packages = [
