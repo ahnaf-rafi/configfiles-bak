@@ -163,8 +163,7 @@ on startup must be marked by a ~:demand t~ keyword argument.
 #+begin_src emacs-lisp
 (use-package exec-path-from-shell
   :init
-  (when (daemonp)
-    (exec-path-from-shell-initialize)))
+  (exec-path-from-shell-initialize))
 #+end_src
 
 * Visuals

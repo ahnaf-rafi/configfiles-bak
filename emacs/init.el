@@ -63,8 +63,7 @@
 
 (use-package exec-path-from-shell
   :init
-  (when (daemonp)
-    (exec-path-from-shell-initialize)))
+  (exec-path-from-shell-initialize))
 
 (add-to-list 'default-frame-alist '(font . "JuliaMono-14.0"))
 (set-face-attribute 'default nil :font "JuliaMono-14.0")
