@@ -74,7 +74,6 @@
         pkgs.rstudio
 
         pkgs.maestral
-        # pkgs.aspell
         (pkgs.aspellWithDicts
           (dicts: with dicts; [ en en-computers en-science ]))
         pkgs.skimpdf
@@ -112,7 +111,7 @@
 
       system.defaults = {
         dock.autohide = true;
-        NSGlobalDomain."com.apple.mouse.tapBehavior" = true;
+        NSGlobalDomain."com.apple.mouse.tapBehavior" = 1;
         NSGlobalDomain.NSTableViewDefaultSizeMode = 2;
         NSGlobalDomain.AppleShowAllExtensions = true;
         controlcenter.BatteryShowPercentage = true;
@@ -125,7 +124,7 @@
           "/Applications/Nix Apps/Emacs.app"
           "/Applications/Nix Apps/Wezterm.app"
           "/Applications/Nix Apps/RStudio.app"
-          "/Applications/Utilities/Activity Monitor.app"
+          "/System/Applications/Utilities/Activity Monitor.app"
         ];
         finder.AppleShowAllExtensions = true;
         finder.AppleShowAllFiles = true;
