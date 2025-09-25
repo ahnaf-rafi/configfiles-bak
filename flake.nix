@@ -112,8 +112,32 @@
 
       system.defaults = {
         dock.autohide = true;
-        finder.FXPreferredViewStyle = "clmv";
+        NSGlobalDomain."com.apple.mouse.tapBehavior" = true;
+        NSGlobalDomain.NSTableViewDefaultSizeMode = 2;
         NSGlobalDomain.AppleShowAllExtensions = true;
+        controlcenter.BatteryShowPercentage = true;
+        controlcenter.Bluetooth = true;
+        controlcenter.Sound = true;
+        dock.magnification = true;
+        dock.persistent-apps = [
+          "/Applications/Google Chrome.app"
+          "/Applications/Nix Apps/Skim.app"
+          "/Applications/Nix Apps/Emacs.app"
+          "/Applications/Nix Apps/Wezterm.app"
+          "/Applications/Nix Apps/RStudio.app"
+          "/Applications/Utilities/Activity Monitor.app"
+        ];
+        finder.AppleShowAllExtensions = true;
+        finder.AppleShowAllFiles = true;
+        finder.FXPreferredViewStyle = "clmv";
+        finder.FXRemoveOldTrashItems = true;
+        finder.NewWindowTarget = "Home";
+        finder.QuitMenuItem = true;
+        finder.ShowPathbar = true;
+        finder._FXSortFoldersFirst = true;
+        finder._FXSortFoldersFirstOnDesktop = true;
+        iCal.CalendarSidebarShown = true;
+        iCal."TimeZone support enabled" = true;
       };
 
       system.keyboard = {
