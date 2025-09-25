@@ -128,7 +128,7 @@
         ];
         finder.AppleShowAllExtensions = true;
         finder.AppleShowAllFiles = true;
-        finder.FXPreferredViewStyle = "clmv";
+        finder.FXPreferredViewStyle = "Nlsv";
         finder.FXRemoveOldTrashItems = true;
         finder.NewWindowTarget = "Home";
         finder.QuitMenuItem = true;
