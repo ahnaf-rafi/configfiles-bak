@@ -74,7 +74,9 @@
         pkgs.rstudio
 
         pkgs.maestral
-        pkgs.aspell
+        # pkgs.aspell
+        (pkgs.aspellWithDicts
+          (dicts: with dicts; [ en en-computers en-science ]))
         pkgs.skimpdf
         pkgs.zathura
         (pkgs.zathura.override {
