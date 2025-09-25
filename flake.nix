@@ -58,15 +58,7 @@
         ))
         neovim-nightly.packages.${pkgs.system}.default
 
-        (pkgs.texlive.combine {
-          inherit (pkgs.texlive)
-          scheme-basic
-          biber
-          amsmath
-          graphics
-          hyperref
-          tcolorbox;
-        })
+        pkgs.texlive.combined.scheme-full
         pkgs.texlab
         pkgs.typst
         pkgs.tinymist
