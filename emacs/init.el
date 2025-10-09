@@ -938,7 +938,7 @@ method to prepare vterm at the corresponding remote directory."
         (setq pdf-view-use-scaling t)
         (setq pdf-view-use-imagemagick nil)))
 
-  ;; (pdf-loader-install)
+  (pdf-loader-install)
   :config
   (evil-collection-pdf-setup)
 
