@@ -9,3 +9,12 @@ source <(fzf --zsh)
 alias ls='eza --color=auto'
 alias ll='eza -alhF --color=auto --group-directories-first'
 alias cat='bat'
+
+# >>> juliaup initialize >>>
+
+# !! Contents within this block are managed by juliaup !!
+
+path=("$HOME/.juliaup/bin" $path)
+export PATH
+
+# <<< juliaup initialize <<<
