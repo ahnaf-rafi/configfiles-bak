@@ -382,8 +382,8 @@ end, {})
 -- disable `K` as it conflicts with LSP hover
 g.vimtex_mappings_disable = { ["n"] = { "K" } }
 g.vimtex_view_method = 'skim'
--- g.vimtex_view_method = 'sioyek'
-g.vimtex_callback_progpath = '/opt/homebrew/bin/nvim'
+-- g.vimtex_callback_progpath = '/opt/homebrew/bin/nvim'
+-- g.vimtex_callback_progpath = exepath(v:progname)
 g.vimtex_fold_enabled = 0
 g.vimtex_indent_enabled = 1
 g.vimtex_indent_delims = {
