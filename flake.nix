@@ -22,63 +22,111 @@
     nix-homebrew, homebrew-core, homebrew-cask
   }:
   let
-    configuration = { pkgs, ... }: {
+    configuration = { config, lib, pkgs, ... }: {
       nix.enable = false;
+      # services.nix-daemon.enable = true;
       nixpkgs.config.allowUnfree = true;
+
+      # The platform the configuration will be used on.
+      nixpkgs.hostPlatform = "aarch64-darwin";
 
       # List packages installed in system profile. To search by name, run:
       # $ nix-env -qaP | grep wget
-      environment.systemPackages = [
-        pkgs.coreutils
-        pkgs.vim
-        pkgs.git
-        pkgs.curl
-        pkgs.wget
-        pkgs.stow
-        pkgs.tmux
-        pkgs.fontconfig
-        pkgs.automake
-        pkgs.autoconf
-        pkgs.autogen
-        pkgs.gcc
-        pkgs.gnumake
-        pkgs.libpng
-        pkgs.zlib
+      environment.systemPackages =
+        let
+          myRPackages = with pkgs.rPackages; [
+            tidyverse
+            ggplot2
+            dplyr
+            haven
+            readxl
+            knitr
+            estimatr
+            rstatix
+            car
+            sandwich
+            AER
+          ];
 
-        pkgs.eza
-        pkgs.bat
-        pkgs.fd
-        pkgs.ripgrep
-        pkgs.fzf
-        pkgs.wezterm
-        pkgs.lazygit
-        pkgs.delta
-        ((pkgs.emacsPackagesFor pkgs.emacs-pgtk).emacsWithPackages (
-          epkgs: [ epkgs.vterm epkgs.pdf-tools epkgs.auctex ]
-        ))
-        neovim-nightly.packages.${pkgs.system}.default
+          myR = pkgs.rWrapper.override {
+            packages = myRPackages;
+          };
 
-        pkgs.texlive.combined.scheme-full
-        pkgs.texlab
-        pkgs.typst
-        pkgs.tinymist
-        pkgs.R
-        pkgs.rstudio
+          myRStudio = pkgs.rstudioWrapper.override {
+            packages = myRPackages;
+          };
+        in
+          [
+            pkgs.coreutils
+            pkgs.vim
+            pkgs.git
+            pkgs.curl
+            pkgs.wget
+            pkgs.stow
+            pkgs.tmux
+            pkgs.fontconfig
+            pkgs.automake
+            pkgs.autoconf
+            pkgs.autogen
+            pkgs.gcc
+            pkgs.gnumake
+            pkgs.libpng
+            pkgs.zlib
 
-        pkgs.maestral
-        (pkgs.aspellWithDicts
-          (dicts: with dicts; [ en en-computers en-science ]))
-        pkgs.skimpdf
-        pkgs.zathura
-        (pkgs.zathura.override {
-          plugins = [ pkgs.zathuraPkgs.zathura_pdf_mupdf ];
-        })
-        pkgs.rectangle
-      ];
+            pkgs.eza
+            pkgs.bat
+            pkgs.fd
+            pkgs.ripgrep
+            pkgs.fzf
+            pkgs.wezterm
+            pkgs.lazygit
+            pkgs.delta
+            ((pkgs.emacsPackagesFor pkgs.emacs-pgtk).emacsWithPackages (
+              epkgs: [
+                epkgs.vterm epkgs.pdf-tools epkgs.auctex
+                epkgs.eglot-jl epkgs.julia-ts-mode
+              ]
+            ))
+            neovim-nightly.packages.${pkgs.system}.default
+
+            pkgs.texlive.combined.scheme-full
+            pkgs.texlab
+            pkgs.typst
+            pkgs.tinymist
+
+            myR
+            myRStudio
+
+            pkgs.maestral
+            (pkgs.aspellWithDicts
+              (dicts: with dicts; [ en en-computers en-science ]))
+            pkgs.skimpdf
+            # pkgs.zathura
+            (pkgs.zathura.override {
+              plugins = [ pkgs.zathuraPkgs.zathura_pdf_mupdf ];
+            })
+            pkgs.rectangle
+          ];
 
       fonts.packages = [
         pkgs.julia-mono
       ];
+
+      homebrew = {
+        enable = true;
+        onActivation.cleanup = "uninstall";
+        # onActivation = {
+        # autoUpdate = true;
+        # upgrade = true;
+        # cleanup = "uninstall";
+        # };
+
+        taps = [];
+        brews = [];
+        casks = [];
+      };
+
+      # services.dbus.enable = true;
 
       # programs.neovim = {
       # enable = true;
@@ -112,10 +160,11 @@
         dock.magnification = true;
         dock.persistent-apps = [
           "/Applications/Google Chrome.app"
+          "/System/Applications/Mail.app"
+          "/System/Applications/Calendar.app"
           "/Applications/Nix Apps/Skim.app"
           "/Applications/Nix Apps/Emacs.app"
           "/Applications/Nix Apps/Wezterm.app"
-          "/Applications/Nix Apps/RStudio.app"
           "/System/Applications/Utilities/Activity Monitor.app"
         ];
         finder.AppleShowAllExtensions = true;
@@ -129,31 +178,45 @@
         finder._FXSortFoldersFirstOnDesktop = true;
         iCal.CalendarSidebarShown = true;
         iCal."TimeZone support enabled" = true;
+
+        CustomUserPreferences = {
+          # Figure out how to set default pdf viewer to Skim.
+          # "com.apple.LaunchServices.OpenWith" = {
+          #   # This specifies the application to handle the public.pdf UTI.
+          #   "public.pdf" = {
+          #     # Use the bundle identifier you found earlier.
+          #     "net.sourceforge.skim-app.Skim" = true;
+          #   };
+          # };
+
+          "com.apple.HIToolbox" = {
+            # Disable auto-enabling dictation
+            AppleDicttionAutoEnable = 0;
+          };
+        };
+
       };
 
       system.keyboard = {
         enableKeyMapping = true;
         remapCapsLockToControl = true;
       };
-
-      # The platform the configuration will be used on.
-      nixpkgs.hostPlatform = "aarch64-darwin";
     };
   in
-  {
-    # Build darwin flake using:
-    # $ darwin-rebuild build --flake .#mb-air-work
-    darwinConfigurations."mb-air-work" = nix-darwin.lib.darwinSystem {
-      modules = [
-        configuration
-        nix-homebrew.darwinModules.nix-homebrew {
-          nix-homebrew = {
-            # Install Homebrew under the default prefix
-            enable = true;
+    {
+      # Build darwin flake using:
+      # $ darwin-rebuild build --flake .#mb-air-work
+      darwinConfigurations."mb-air-work" = nix-darwin.lib.darwinSystem {
+        modules = [
+          configuration
+          nix-homebrew.darwinModules.nix-homebrew {
+            nix-homebrew = {
+              # Install Homebrew under the default prefix
+              enable = true;
 
-            # Apple Silicon Only: Also install Homebrew under the default Intel
-            # prefix for Rosetta 2
-            enableRosetta = true;
+              # Apple Silicon Only: Also install Homebrew under the default Intel
+              # prefix for Rosetta 2
+              enableRosetta = true;
 
             # User owning the Homebrew prefix
             user = "ahnafrafi";
