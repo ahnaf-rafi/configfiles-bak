@@ -1,17 +1,44 @@
 {
   "plugins": {
-    "LuaSnip": [],
-    "R.nvim": [],
+    "LuaSnip": {
+      "rev": "3732756",
+      "src": "https://github.com/L3MON4D3/LuaSnip"
+    },
+    "R.nvim": {
+      "rev": "fef9903",
+      "src": "https://github.com/R-nvim/R.nvim"
+    },
     "fzf-lua": {
       "rev": "9fa87ea",
       "src": "https://github.com/ibhagwan/fzf-lua"
     },
-    "gruvbox.nvim": [],
-    "nvim-lspconfig": [],
-    "nvim-surround": [],
-    "nvim-treesitter": [],
-    "oil.nvim": [],
-    "typst-preview.nvim": [],
-    "vimtex": []
+    "gruvbox.nvim": {
+      "rev": "5e0a460",
+      "src": "https://github.com/ellisonleao/gruvbox.nvim"
+    },
+    "nvim-lspconfig": {
+      "rev": "abf6d19",
+      "src": "https://github.com/neovim/nvim-lspconfig"
+    },
+    "nvim-surround": {
+      "rev": "fcfa7e0",
+      "src": "https://github.com/kylechui/nvim-surround"
+    },
+    "nvim-treesitter": {
+      "rev": "42fc28ba",
+      "src": "https://github.com/nvim-treesitter/nvim-treesitter"
+    },
+    "oil.nvim": {
+      "rev": "7e1cd77",
+      "src": "https://github.com/stevearc/oil.nvim"
+    },
+    "typst-preview.nvim": {
+      "rev": "64469f8",
+      "src": "https://github.com/chomosuke/typst-preview.nvim"
+    },
+    "vimtex": {
+      "rev": "32bcb392",
+      "src": "https://github.com/lervag/vimtex"
+    }
   }
 }

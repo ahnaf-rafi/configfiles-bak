@@ -52,9 +52,9 @@
             packages = myRPackages;
           };
 
-          myRStudio = pkgs.rstudioWrapper.override {
-            packages = myRPackages;
-          };
+            # myRStudio = pkgs.rstudioWrapper.override {
+            # packages = myRPackages;
+            # };
         in
           [
             pkgs.coreutils
@@ -106,7 +106,7 @@
             pkgs.pandoc
 
             myR
-            myRStudio
+            # myRStudio
 
             pkgs.readstat
             pkgs.maestral
