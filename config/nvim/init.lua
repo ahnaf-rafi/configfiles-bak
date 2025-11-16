@@ -152,6 +152,9 @@ vim.pack.add({
   -- File browsing
   {src = "https://github.com/stevearc/oil.nvim"},
 
+  -- Fuzzy finding
+  {src = "https://github.com/ibhagwan/fzf-lua"},
+
   -- Language Server Protocol (LSP)
   {src = "https://github.com/neovim/nvim-lspconfig"},
 
@@ -170,10 +173,8 @@ vim.pack.add({
 --------------------------------------------------------------------------------
 --- Colorscheme
 --------------------------------------------------------------------------------
-
 opt.background = "dark"
 vim.cmd("colorscheme gruvbox")
-
 
 --------------------------------------------------------------------------------
 --- Editing Plugins
@@ -184,6 +185,15 @@ require("nvim-surround").setup({})
 --- Oil configuration
 --------------------------------------------------------------------------------
 require("oil").setup()
+
+--------------------------------------------------------------------------------
+--- fzf-lua
+--------------------------------------------------------------------------------
+require('fzf-lua').setup()
+keymap({"n", "v"}, "<leader>ff",
+  FzfLua.files,
+  keyopts)
+keymap({"n", "v"}, "<leader>bb", ":FzfLua buffers<cr>", keyopts)
 
 --------------------------------------------------------------------------------
 --- LSP configuration
@@ -271,7 +281,7 @@ vim.api.nvim_create_autocmd("LspAttach", {
   end
 })
 
-vim.lsp.enable({"lua_ls", "texlab", "tinymist"})
+vim.lsp.enable({"lua_ls", "texlab", "tinymist", "julials"})
 
 vim.lsp.config("lua_ls", {
   settings = {
@@ -290,7 +300,24 @@ vim.lsp.config("tinymist", {
     formatterMode = "typstyle",
     exportPdf = "onType",
     semanticTokens = "disable"
-  }
+  },
+  on_attach = function(client, bufnr)
+    vim.keymap.set("n", "<leader>tp", function()
+      client:exec_cmd({
+        title = "pin",
+        command = "tinymist.pinMain",
+        arguments = { vim.api.nvim_buf_get_name(0) },
+      }, { bufnr = bufnr })
+    end, { desc = "[T]inymist [P]in", noremap = true })
+
+    vim.keymap.set("n", "<leader>tu", function()
+      client:exec_cmd({
+        title = "unpin",
+        command = "tinymist.pinMain",
+        arguments = { vim.v.null },
+      }, { bufnr = bufnr })
+    end, { desc = "[T]inymist [U]npin", noremap = true })
+  end,
 })
 
 --------------------------------------------------------------------------------
@@ -308,8 +335,10 @@ require("nvim-treesitter.configs").setup({
     "lua",
     "markdown",
     "markdown_inline",
+    "nix",
     "r",
     "rnoweb",
+    "typst",
     "vim",
     "vimdoc",
     "yaml"
@@ -381,7 +410,8 @@ end, {})
 --------------------------------------------------------------------------------
 -- disable `K` as it conflicts with LSP hover
 g.vimtex_mappings_disable = { ["n"] = { "K" } }
-g.vimtex_view_method = 'skim'
+g.vimtex_view_method = 'sioyek'
+-- g.vimtex_view_method = 'skim'
 -- g.vimtex_callback_progpath = '/opt/homebrew/bin/nvim'
 -- g.vimtex_callback_progpath = exepath(v:progname)
 g.vimtex_fold_enabled = 0
@@ -417,6 +447,8 @@ g.vimtex_indent_ignored_envs = {
   "eg",
   "notation",
   "note",
+  "problem",
+  "solution",
   "proof"
 }
 

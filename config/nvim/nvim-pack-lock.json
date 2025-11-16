@@ -1,0 +1,17 @@
+{
+  "plugins": {
+    "LuaSnip": [],
+    "R.nvim": [],
+    "fzf-lua": {
+      "rev": "9fa87ea",
+      "src": "https://github.com/ibhagwan/fzf-lua"
+    },
+    "gruvbox.nvim": [],
+    "nvim-lspconfig": [],
+    "nvim-surround": [],
+    "nvim-treesitter": [],
+    "oil.nvim": [],
+    "typst-preview.nvim": [],
+    "vimtex": []
+  }
+}

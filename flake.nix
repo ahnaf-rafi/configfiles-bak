@@ -72,6 +72,7 @@
             pkgs.gnumake
             pkgs.libpng
             pkgs.zlib
+            pkgs.brave
 
             pkgs.eza
             pkgs.bat
@@ -79,24 +80,35 @@
             pkgs.ripgrep
             pkgs.fzf
             pkgs.wezterm
+            pkgs.ghostty-bin
             pkgs.lazygit
             pkgs.delta
             ((pkgs.emacsPackagesFor pkgs.emacs-pgtk).emacsWithPackages (
               epkgs: [
-                epkgs.vterm epkgs.pdf-tools epkgs.auctex
+                epkgs.gcmh
+                epkgs.exec-path-from-shell
+                epkgs.doom-themes
+                epkgs.nerd-icons
+                epkgs.vterm
+                epkgs.pdf-tools
+                epkgs.auctex
                 epkgs.eglot-jl epkgs.julia-ts-mode
               ]
             ))
+
             neovim-nightly.packages.${pkgs.system}.default
 
             pkgs.texlive.combined.scheme-full
             pkgs.texlab
+            pkgs.nixd
             pkgs.typst
             pkgs.tinymist
+            pkgs.pandoc
 
             myR
             myRStudio
 
+            pkgs.readstat
             pkgs.maestral
             (pkgs.aspellWithDicts
               (dicts: with dicts; [ en en-computers en-science ]))
@@ -106,6 +118,9 @@
               plugins = [ pkgs.zathuraPkgs.zathura_pdf_mupdf ];
             })
             pkgs.rectangle
+            pkgs.sioyek
+
+            pkgs.lynx
           ];
 
       fonts.packages = [
@@ -182,11 +197,11 @@
         CustomUserPreferences = {
           # Figure out how to set default pdf viewer to Skim.
           # "com.apple.LaunchServices.OpenWith" = {
-          #   # This specifies the application to handle the public.pdf UTI.
-          #   "public.pdf" = {
-          #     # Use the bundle identifier you found earlier.
-          #     "net.sourceforge.skim-app.Skim" = true;
-          #   };
+          # # This specifies the application to handle the public.pdf UTI.
+          # "public.pdf" = {
+          # # Use the bundle identifier you found earlier.
+          # "net.sourceforge.skim-app.Skim" = true;
+          # };
           # };
 
           "com.apple.HIToolbox" = {
@@ -214,8 +229,8 @@
               # Install Homebrew under the default prefix
               enable = true;
 
-              # Apple Silicon Only: Also install Homebrew under the default Intel
-              # prefix for Rosetta 2
+              # Apple Silicon Only: Also install Homebrew under the default
+              # Intel prefix for Rosetta 2
               enableRosetta = true;
 
             # User owning the Homebrew prefix

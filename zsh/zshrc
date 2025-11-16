@@ -6,7 +6,7 @@ export MANPAGER="nvim +Man!"
 
 source <(fzf --zsh)
 
-alias ls='eza --color=auto'
+# alias ls='eza --color=auto'
 alias ll='eza -alhF --color=auto --group-directories-first'
 alias cat='bat'
 

@@ -8,7 +8,7 @@ config.font = wezterm.font_with_fallback {
   'JuliaMono',
   'JetBrains Mono'
 }
-config.font_size = 12.0
+config.font_size = 13.0
 
 config.enable_tab_bar = true
 config.hide_tab_bar_if_only_one_tab = true

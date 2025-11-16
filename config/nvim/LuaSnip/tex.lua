@@ -150,14 +150,14 @@ return {
 
   ms(
     {{trig = "item"}, {trig = "itemize"}},
-    {t({"\\begin{itemize}", " \\item "}), i(0), t({"", "\\end{itemize}"})}
+    {t({"\\begin{itemize}", "  \\item "}), i(0), t({"", "\\end{itemize}"})}
   ),
 
   s({trig = "it"}, {t({"", "\\item "})}),
 
   ms(
     {{trig = "enum"}, {trig = "enumerate"}},
-    {t({"\\begin{enumerate}", " \\item "}), i(0), t({"", "\\end{enumerate}"})}
+    {t({"\\begin{enumerate}", "  \\item "}), i(0), t({"", "\\end{enumerate}"})}
   ),
 
   s(
