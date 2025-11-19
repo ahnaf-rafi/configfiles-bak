@@ -34,27 +34,25 @@
       # $ nix-env -qaP | grep wget
       environment.systemPackages =
         let
-          myRPackages = with pkgs.rPackages; [
-            tidyverse
-            ggplot2
-            dplyr
-            haven
-            readxl
-            knitr
-            estimatr
-            rstatix
-            car
-            sandwich
-            AER
-          ];
+          llvm = pkgs.llvmPackages_latest;
 
-          myR = pkgs.rWrapper.override {
-            packages = myRPackages;
-          };
+          # myRPackages = with pkgs.rPackages; [
+          #   tidyverse
+          #   ggplot2
+          #   dplyr
+          #   haven
+          #   readxl
+          #   knitr
+          #   estimatr
+          #   rstatix
+          #   car
+          #   sandwich
+          #   AER
+          # ];
 
-            # myRStudio = pkgs.rstudioWrapper.override {
-            # packages = myRPackages;
-            # };
+          # myR = pkgs.rWrapper.override {
+          #   packages = myRPackages;
+          # };
         in
           [
             pkgs.coreutils
@@ -89,14 +87,23 @@
                 epkgs.exec-path-from-shell
                 epkgs.doom-themes
                 epkgs.nerd-icons
+                epkgs.nerd-icons-dired
+                epkgs.nerd-icons-ibuffer
+                epkgs.nerd-icons-completion
+                epkgs.nerd-icons-corfu
                 epkgs.vterm
                 epkgs.pdf-tools
                 epkgs.auctex
-                epkgs.eglot-jl epkgs.julia-ts-mode
+                epkgs.auctex-cont-latexmk
+                epkgs.preview-auto
+                epkgs.auctex-label-numbers
+                epkgs.preview-tailor
+                epkgs.eglot-jl
+                epkgs.julia-ts-mode
               ]
             ))
 
-            neovim-nightly.packages.${pkgs.system}.default
+            neovim-nightly.packages.${pkgs.stdenv.hostPlatform.system}.default
 
             pkgs.texlive.combined.scheme-full
             pkgs.texlab
@@ -105,10 +112,13 @@
             pkgs.tinymist
             pkgs.pandoc
 
-            myR
-            # myRStudio
+            # pkgs.gdb                     # or pkgs.lldb
+            # llvm.clang
+            # llvm.libclang
+            # llvm.libcxx
+            # myR
+            # pkgs.readstat
 
-            pkgs.readstat
             pkgs.maestral
             (pkgs.aspellWithDicts
               (dicts: with dicts; [ en en-computers en-science ]))
@@ -123,8 +133,31 @@
             pkgs.lynx
           ];
 
+      # # Keep R from ever touching ~/Library/R/x.y
+      # R_LIBS_USER = "";          # disable user library
+      # R_ENVIRON_USER = "/dev/null";
+      # R_PROFILE_USER = "/dev/null";
+
+      # # Make Nix-provided libraries visible to compilers/linker.
+      # # Nix wraps R, so this is often redundant, but helps for source builds.
+      # NIX_CFLAGS_COMPILE = "-O1 -g -fno-omit-frame-pointer";
+      # NIX_LDFLAGS = "";
+
+      # # # Sanitizer defaults (you can toggle when you want)
+      # # ASAN_OPTIONS = "detect_leaks=1,check_initialization_order=1";
+      # # UBSAN_OPTIONS = "print_stacktrace=1,halt_on_error=1";
+
+      # # Nice-to-have: keep PATH clean
+      # shellHook = ''
+      #   echo ">> Using Nix R at: $(which R)"
+      #   echo ">> .libPaths() inside R should show only nix store paths."
+      #   echo ">> User site library disabled (R_LIBS_USER empty)."
+      # '';
+
       fonts.packages = [
         pkgs.julia-mono
+        pkgs.nerd-fonts.jetbrains-mono
+        pkgs.nerd-fonts.symbols-only
       ];
 
       homebrew = {
@@ -140,13 +173,6 @@
         brews = [];
         casks = [];
       };
-
-      # services.dbus.enable = true;
-
-      # programs.neovim = {
-      # enable = true;
-      # package = inputs.neovim-nightly.packages.${pkgs.system}.default;
-      # };
 
       # Necessary for using flakes on this system.
       nix.settings.experimental-features = "nix-command flakes";

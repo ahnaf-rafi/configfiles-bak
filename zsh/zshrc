@@ -10,6 +10,8 @@ source <(fzf --zsh)
 alias ll='eza -alhF --color=auto --group-directories-first'
 alias cat='bat'
 
+# export FONTCONFIG_FILE=$(nix-build -E 'let pkgs = import <nixpkgs> { }; in pkgs.makeFontsConf { fontDirectories = [ pkgs.freefont_ttf ]; }')
+
 # >>> juliaup initialize >>>
 
 # !! Contents within this block are managed by juliaup !!

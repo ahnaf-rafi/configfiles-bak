@@ -506,7 +506,7 @@ Yeah, I'm one of those.
 #+end_src
 
 *** ~nerd-icons-ibuffer~
-#+begin_src emacs-lisp
+#+begin_src emacs-lisp :tangle no
 (use-package nerd-icons-ibuffer
   :hook (ibuffer-mode . nerd-icons-ibuffer-mode))
 #+end_src
@@ -685,7 +685,7 @@ This persists minibuffer history over Emacs restarts.
 #+end_src
 
 *** ~nerd-icons-completion~
-#+begin_src emacs-lisp
+#+begin_src emacs-lisp :tangle no
 (use-package nerd-icons-completion
   :init
   (nerd-icons-completion-mode))

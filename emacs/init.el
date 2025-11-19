@@ -321,9 +321,6 @@
 (use-package ibuffer
   :hook (ibuffer-mode . (lambda () (visual-line-mode -1))))
 
-(use-package nerd-icons-ibuffer
-  :hook (ibuffer-mode . nerd-icons-ibuffer-mode))
-
 ;; (add-hook 'after-init-hook #'global-auto-revert-mode)
 
 (add-hook 'after-init-hook #'global-visual-line-mode)
@@ -448,10 +445,6 @@
   ;; completion functions takes precedence over the global list.
   (add-hook 'completion-at-point-functions #'cape-file)
 )
-
-(use-package nerd-icons-completion
-  :init
-  (nerd-icons-completion-mode))
 
 (setq insert-directory-program "ls"
       dired-use-ls-dired nil)
