@@ -1,1 +1,1 @@
-# Ahnaf Rafi's configuration files
+# Ahnaf Rafi's configuration files (will be archived soon)
