@@ -32,106 +32,79 @@
 
       # List packages installed in system profile. To search by name, run:
       # $ nix-env -qaP | grep wget
-      environment.systemPackages =
-        let
-          llvm = pkgs.llvmPackages_latest;
+      environment.systemPackages = [
+        pkgs.coreutils
+        pkgs.vim
+        pkgs.git
+        pkgs.curl
+        pkgs.wget
+        pkgs.stow
+        pkgs.tmux
+        pkgs.fontconfig
+        pkgs.automake
+        pkgs.autoconf
+        pkgs.autogen
+        pkgs.gcc
+        pkgs.gnumake
+        pkgs.libpng
+        pkgs.zlib
+        pkgs.brave
 
-          # myRPackages = with pkgs.rPackages; [
-          #   tidyverse
-          #   ggplot2
-          #   dplyr
-          #   haven
-          #   readxl
-          #   knitr
-          #   estimatr
-          #   rstatix
-          #   car
-          #   sandwich
-          #   AER
-          # ];
+        pkgs.eza
+        pkgs.bat
+        pkgs.fd
+        pkgs.ripgrep
+        pkgs.fzf
+        pkgs.wezterm
+        pkgs.ghostty-bin
+        pkgs.lazygit
+        pkgs.delta
+        ((pkgs.emacsPackagesFor pkgs.emacs-pgtk).emacsWithPackages (
+          epkgs: [
+            epkgs.gcmh
+            epkgs.exec-path-from-shell
+            epkgs.doom-themes
+            epkgs.nerd-icons
+            epkgs.nerd-icons-dired
+            epkgs.nerd-icons-ibuffer
+            epkgs.nerd-icons-completion
+            epkgs.nerd-icons-corfu
+            epkgs.vterm
+            epkgs.pdf-tools
+            epkgs.auctex
+            epkgs.auctex-cont-latexmk
+            epkgs.preview-auto
+            epkgs.auctex-label-numbers
+            epkgs.preview-tailor
+            epkgs.eglot-jl
+            epkgs.julia-ts-mode
+          ]
+        ))
 
-          # myR = pkgs.rWrapper.override {
-          #   packages = myRPackages;
-          # };
-        in
-          [
-            pkgs.coreutils
-            pkgs.vim
-            pkgs.git
-            pkgs.curl
-            pkgs.wget
-            pkgs.stow
-            pkgs.tmux
-            pkgs.fontconfig
-            pkgs.automake
-            pkgs.autoconf
-            pkgs.autogen
-            pkgs.gcc
-            pkgs.gnumake
-            pkgs.libpng
-            pkgs.zlib
-            pkgs.brave
+        neovim-nightly.packages.${pkgs.stdenv.hostPlatform.system}.default
 
-            pkgs.eza
-            pkgs.bat
-            pkgs.fd
-            pkgs.ripgrep
-            pkgs.fzf
-            pkgs.wezterm
-            pkgs.ghostty-bin
-            pkgs.lazygit
-            pkgs.delta
-            ((pkgs.emacsPackagesFor pkgs.emacs-pgtk).emacsWithPackages (
-              epkgs: [
-                epkgs.gcmh
-                epkgs.exec-path-from-shell
-                epkgs.doom-themes
-                epkgs.nerd-icons
-                epkgs.nerd-icons-dired
-                epkgs.nerd-icons-ibuffer
-                epkgs.nerd-icons-completion
-                epkgs.nerd-icons-corfu
-                epkgs.vterm
-                epkgs.pdf-tools
-                epkgs.auctex
-                epkgs.auctex-cont-latexmk
-                epkgs.preview-auto
-                epkgs.auctex-label-numbers
-                epkgs.preview-tailor
-                epkgs.eglot-jl
-                epkgs.julia-ts-mode
-              ]
-            ))
+        pkgs.texlive.combined.scheme-full
+        pkgs.texlab
+        pkgs.nixd
+        pkgs.typst
+        pkgs.tinymist
+        pkgs.pandoc
 
-            neovim-nightly.packages.${pkgs.stdenv.hostPlatform.system}.default
+        # pkgs.readstat
 
-            pkgs.texlive.combined.scheme-full
-            pkgs.texlab
-            pkgs.nixd
-            pkgs.typst
-            pkgs.tinymist
-            pkgs.pandoc
+        pkgs.maestral
+        (pkgs.aspellWithDicts
+          (dicts: with dicts; [ en en-computers en-science ]))
+        pkgs.skimpdf
+        # pkgs.zathura
+        (pkgs.zathura.override {
+          plugins = [ pkgs.zathuraPkgs.zathura_pdf_mupdf ];
+        })
+        pkgs.rectangle
+        pkgs.sioyek
 
-            # pkgs.gdb                     # or pkgs.lldb
-            # llvm.clang
-            # llvm.libclang
-            # llvm.libcxx
-            # myR
-            # pkgs.readstat
-
-            pkgs.maestral
-            (pkgs.aspellWithDicts
-              (dicts: with dicts; [ en en-computers en-science ]))
-            pkgs.skimpdf
-            # pkgs.zathura
-            (pkgs.zathura.override {
-              plugins = [ pkgs.zathuraPkgs.zathura_pdf_mupdf ];
-            })
-            pkgs.rectangle
-            pkgs.sioyek
-
-            pkgs.lynx
-          ];
+        pkgs.lynx
+      ];
 
       # # Keep R from ever touching ~/Library/R/x.y
       # R_LIBS_USER = "";          # disable user library

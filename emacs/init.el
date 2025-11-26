@@ -1092,9 +1092,14 @@ method to prepare vterm at the corresponding remote directory."
   ;; don't add "--open" if you'd like `watch` to be an error detector
   (typst-ts-mode-watch-options "--open")
 
-  ;; experimental settings (I'm the main dev, so I enable these)
   (typst-ts-mode-enable-raw-blocks-highlight t)
-  (typst-ts-mode-highlight-raw-blocks-at-startup t))
+  (typst-ts-mode-highlight-raw-blocks-at-startup t)
+  (typst-ts-math-script-display ' ((raise 0.0) raise 0.0))
+  (typst-ts-indent-offset 2)
+
+  :config
+  (set-face-attribute 'typst-ts-subscript-face nil :height 1.0)
+  (set-face-attribute 'typst-ts-superscript-face nil :height 1.0))
 
 (use-package websocket)
 
