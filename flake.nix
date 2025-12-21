@@ -60,25 +60,25 @@
         pkgs.ghostty-bin
         pkgs.lazygit
         pkgs.delta
-        ((pkgs.emacsPackagesFor pkgs.emacs-pgtk).emacsWithPackages (
+        ((pkgs.emacsPackagesFor pkgs.emacs).emacsWithPackages (
           epkgs: [
-            epkgs.gcmh
-            epkgs.exec-path-from-shell
-            epkgs.doom-themes
+            epkgs.pdf-tools
+            epkgs.vterm
+            epkgs.auctex
+            epkgs.auctex-cont-latexmk
+            epkgs.auctex-label-numbers
+            epkgs.preview-auto
+            epkgs.preview-tailor
+            epkgs.eglot-jl
+            epkgs.julia-ts-mode
             epkgs.nerd-icons
             epkgs.nerd-icons-dired
             epkgs.nerd-icons-ibuffer
             epkgs.nerd-icons-completion
             epkgs.nerd-icons-corfu
-            epkgs.vterm
-            epkgs.pdf-tools
-            epkgs.auctex
-            epkgs.auctex-cont-latexmk
-            epkgs.preview-auto
-            epkgs.auctex-label-numbers
-            epkgs.preview-tailor
-            epkgs.eglot-jl
-            epkgs.julia-ts-mode
+            epkgs.doom-themes
+            epkgs.gcmh
+            epkgs.exec-path-from-shell
           ]
         ))
 
