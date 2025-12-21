@@ -59,7 +59,10 @@ Comments in the source block explain the code.
 
 ;; Set driver options for native compilation if using MacOS.
 (when (eq system-type 'darwin)
-  (setq native-comp-driver-options '("-Wl,-w")))
+  (setq native-comp-driver-options '("-Wl,-w"))
+  (setq native-comp-compiler (or (executable-find "clang")
+                                 native-comp-compiler))
+  )
 
 (provide 'early-init)
 ;;; early-init.el ends here
@@ -106,7 +109,7 @@ Here are the first few lines of ~init.el~.
 ;; Auto-save transforms
 (setq auto-save-file-name-transforms
       (list (list "\\`/[^/]*:\\([^/]*/\\)*\\([^/]*\\)\\'"
-                  ; Prefix tramp auto-saves to prevent conflicts
+                                        ; Prefix tramp auto-saves to prevent conflicts
                   (concat auto-save-list-file-prefix "tramp-\\2") t)
             (list ".*" auto-save-list-file-prefix t)))
 #+end_src
@@ -215,15 +218,15 @@ Themes]]; these are both great and built in to more recent versions of
 Emacs.
 The following snippet loads the a variant according to ~aar/use-dark-theme~.
 #+begin_src emacs-lisp
-  (mapc #'disable-theme custom-enabled-themes)
-  (require-theme 'modus-themes)
-  (setq modus-themes-org-blocks 'gray-background)
-    (setq modus-themes-disable-other-themes t)
-    ;; (setq doom-gruvbox-dark-variant "hard")
+(mapc #'disable-theme custom-enabled-themes)
+(require-theme 'modus-themes)
+(setq modus-themes-org-blocks 'gray-background)
+(setq modus-themes-disable-other-themes t)
+;; (setq doom-gruvbox-dark-variant "hard")
 
-    (if aar/use-dark-theme
-        (modus-themes-load-theme 'modus-vivendi-tinted)
-      (modus-themes-load-theme 'modus-operandi-tinted))
+(if aar/use-dark-theme
+    (modus-themes-load-theme 'modus-vivendi-tinted)
+  (modus-themes-load-theme 'modus-operandi-tinted))
 #+end_src
 
 ** ~hl-todo~
@@ -340,7 +343,7 @@ Yeah, I'm one of those.
     :global-prefix "C-SPC m")
 
   (aar/localleader
-   "" '(nil :which-key "<localleader>"))
+    "" '(nil :which-key "<localleader>"))
 
   ;; Some basic <leader> keybindings
   (aar/leader
@@ -599,8 +602,8 @@ completions.
   (vertico-mode)
   :general
   (:keymaps 'vertico-map
-   "M-n"       #'vertico-next
-   "M-p"       #'vertico-previous))
+            "M-n"       #'vertico-next
+            "M-p"       #'vertico-previous))
 #+end_src
 
 *** ~savehist~
@@ -661,11 +664,11 @@ This persists minibuffer history over Emacs restarts.
   (global-corfu-mode)
   :general
   (:keymaps 'corfu-map
-	 "TAB"         #'corfu-next
-	 "<backtab>>"  #'corfu-previous
-	 "M-n"         #'corfu-next
-	 "M-p"         #'corfu-previous
-   "RET"         nil))
+	          "TAB"         #'corfu-next
+	          "<backtab>>"  #'corfu-previous
+	          "M-n"         #'corfu-next
+	          "M-p"         #'corfu-previous
+            "RET"         nil))
 #+end_src
 
 *** ~cape~
@@ -681,7 +684,7 @@ This persists minibuffer history over Emacs restarts.
   ;; first function returning a result wins.  Note that the list of buffer-local
   ;; completion functions takes precedence over the global list.
   (add-hook 'completion-at-point-functions #'cape-file)
-)
+  )
 #+end_src
 
 *** ~nerd-icons-completion~
@@ -716,9 +719,9 @@ This persists minibuffer history over Emacs restarts.
     (require 'dired-x)
     (define-key dired-mode-map [remap dired-find-file] #'dired-single-buffer)
     (define-key dired-mode-map [remap dired-mouse-find-file-other-window]
-		#'dired-single-buffer-mouse)
+		            #'dired-single-buffer-mouse)
     (define-key dired-mode-map [remap dired-up-directory]
-    #'dired-single-up-directory)
+                #'dired-single-up-directory)
     (evil-define-key '(normal visual motion) dired-mode-map
       (kbd "h") #'dired-single-up-directory
       (kbd "l") #'dired-single-buffer)))

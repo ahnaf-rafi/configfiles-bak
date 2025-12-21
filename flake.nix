@@ -44,8 +44,9 @@
         pkgs.automake
         pkgs.autoconf
         pkgs.autogen
-        pkgs.gcc
         pkgs.libgccjit
+        pkgs.llvmPackages.clang
+        pkgs.cctools
         pkgs.gnumake
         pkgs.libpng
         pkgs.zlib

@@ -32,7 +32,10 @@
 
 ;; Set driver options for native compilation if using MacOS.
 (when (eq system-type 'darwin)
-  (setq native-comp-driver-options '("-Wl,-w")))
+  (setq native-comp-driver-options '("-Wl,-w"))
+  (setq native-comp-compiler (or (executable-find "clang")
+                                 native-comp-compiler))
+  )
 
 (provide 'early-init)
 ;;; early-init.el ends here

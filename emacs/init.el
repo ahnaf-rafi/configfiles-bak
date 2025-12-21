@@ -34,7 +34,7 @@
 ;; Auto-save transforms
 (setq auto-save-file-name-transforms
       (list (list "\\`/[^/]*:\\([^/]*/\\)*\\([^/]*\\)\\'"
-                  ; Prefix tramp auto-saves to prevent conflicts
+                                        ; Prefix tramp auto-saves to prevent conflicts
                   (concat auto-save-list-file-prefix "tramp-\\2") t)
             (list ".*" auto-save-list-file-prefix t)))
 
@@ -90,15 +90,15 @@
 (defvar aar/use-dark-theme nil
   "Use dark theme if `t' otherwise, use light theme")
 
-  (mapc #'disable-theme custom-enabled-themes)
-  (require-theme 'modus-themes)
-  (setq modus-themes-org-blocks 'gray-background)
-    (setq modus-themes-disable-other-themes t)
-    ;; (setq doom-gruvbox-dark-variant "hard")
+(mapc #'disable-theme custom-enabled-themes)
+(require-theme 'modus-themes)
+(setq modus-themes-org-blocks 'gray-background)
+(setq modus-themes-disable-other-themes t)
+;; (setq doom-gruvbox-dark-variant "hard")
 
-    (if aar/use-dark-theme
-        (modus-themes-load-theme 'modus-vivendi-tinted)
-      (modus-themes-load-theme 'modus-operandi-tinted))
+(if aar/use-dark-theme
+    (modus-themes-load-theme 'modus-vivendi-tinted)
+  (modus-themes-load-theme 'modus-operandi-tinted))
 
 (use-package hl-todo
   :init
@@ -194,7 +194,7 @@
     :global-prefix "C-SPC m")
 
   (aar/localleader
-   "" '(nil :which-key "<localleader>"))
+    "" '(nil :which-key "<localleader>"))
 
   ;; Some basic <leader> keybindings
   (aar/leader
@@ -381,8 +381,8 @@
   (vertico-mode)
   :general
   (:keymaps 'vertico-map
-   "M-n"       #'vertico-next
-   "M-p"       #'vertico-previous))
+            "M-n"       #'vertico-next
+            "M-p"       #'vertico-previous))
 
 (setq savehist-save-minibuffer-history t)
 (add-hook 'after-init-hook #'savehist-mode)
@@ -427,11 +427,11 @@
   (global-corfu-mode)
   :general
   (:keymaps 'corfu-map
-	 "TAB"         #'corfu-next
-	 "<backtab>>"  #'corfu-previous
-	 "M-n"         #'corfu-next
-	 "M-p"         #'corfu-previous
-   "RET"         nil))
+	          "TAB"         #'corfu-next
+	          "<backtab>>"  #'corfu-previous
+	          "M-n"         #'corfu-next
+	          "M-p"         #'corfu-previous
+            "RET"         nil))
 
 ;; TODO: Configure properly
 (use-package cape
@@ -444,7 +444,7 @@
   ;; first function returning a result wins.  Note that the list of buffer-local
   ;; completion functions takes precedence over the global list.
   (add-hook 'completion-at-point-functions #'cape-file)
-)
+  )
 
 (setq insert-directory-program "ls"
       dired-use-ls-dired nil)
@@ -462,9 +462,9 @@
     (require 'dired-x)
     (define-key dired-mode-map [remap dired-find-file] #'dired-single-buffer)
     (define-key dired-mode-map [remap dired-mouse-find-file-other-window]
-		#'dired-single-buffer-mouse)
+		            #'dired-single-buffer-mouse)
     (define-key dired-mode-map [remap dired-up-directory]
-    #'dired-single-up-directory)
+                #'dired-single-up-directory)
     (evil-define-key '(normal visual motion) dired-mode-map
       (kbd "h") #'dired-single-up-directory
       (kbd "l") #'dired-single-buffer)))
