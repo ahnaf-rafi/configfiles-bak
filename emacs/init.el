@@ -1086,6 +1086,8 @@ method to prepare vterm at the corresponding remote directory."
 
 (use-package matlab-mode)
 
+(use-package vimrc-mode)
+
 (use-package typst-ts-mode
   :vc (:url "https://codeberg.org/meow_king/typst-ts-mode")
   :custom
@@ -1100,6 +1102,15 @@ method to prepare vterm at the corresponding remote directory."
   :config
   (set-face-attribute 'typst-ts-subscript-face nil :height 1.0)
   (set-face-attribute 'typst-ts-superscript-face nil :height 1.0))
+
+;;;###autoload
+(defun aar/typst-mode-h ()
+  (visual-line-mode 1)
+  (auto-fill-mode 1)
+  (adaptive-wrap-prefix-mode 1)
+  (eglot-ensure))
+
+(add-hook 'typst-ts-mode-hook #'aar/typst-mode-h)
 
 (use-package websocket)
 
@@ -1120,197 +1131,197 @@ method to prepare vterm at the corresponding remote directory."
 
 (setq tex-fontify-script nil)
 
-  (use-package tex
-    :ensure auctex
-    :general
-    (:states 'insert :keymaps 'LaTeX-mode-map
-  	   "C-'" "\\")
-    :init
-    (setq TeX-save-query nil)
-    (setq TeX-source-correlate-mode t)
-    (setq TeX-source-correlate-start-server t)
-    (setq TeX-electric-sub-and-superscript t)
-    (setq TeX-electric-math (cons "\\(" "\\)"))
-    ;; (setq LaTeX-fill-break-at-separators nil)
-    (setq LaTeX-indent-environment-list nil)
-    ;; (setq LaTeX-indent-level 0)
-    ;; (setq LaTeX-indent-level-item-continuation 4)
-    ;; (setq LaTeX-item-indent 2)
-    (setq TeX-brace-indent-level 0)
-    (setq LaTeX-left-right-indent-level 0)
-    (setq LaTeX-electric-left-right-brace t)
-    (setq LaTeX-section-hook '(LaTeX-section-heading
-                               LaTeX-section-title
-                               LaTeX-section-toc
-                               LaTeX-section-section
-                               LaTeX-section-label))
-    (setq preview-auto-cache-preamble t)
+(use-package tex
+  :ensure auctex
+  :general
+  (:states 'insert :keymaps 'LaTeX-mode-map
+               "C-'" "\\")
+  :init
+  (setq TeX-save-query nil)
+  (setq TeX-source-correlate-mode t)
+  (setq TeX-source-correlate-start-server t)
+  (setq TeX-electric-sub-and-superscript t)
+  (setq TeX-electric-math (cons "\\(" "\\)"))
+  ;; (setq LaTeX-fill-break-at-separators nil)
+  (setq LaTeX-indent-environment-list nil)
+  ;; (setq LaTeX-indent-level 0)
+  ;; (setq LaTeX-indent-level-item-continuation 4)
+  ;; (setq LaTeX-item-indent 2)
+  (setq TeX-brace-indent-level 0)
+  (setq LaTeX-left-right-indent-level 0)
+  (setq LaTeX-electric-left-right-brace t)
+  (setq LaTeX-section-hook '(LaTeX-section-heading
+                             LaTeX-section-title
+                             LaTeX-section-toc
+                             LaTeX-section-section
+                             LaTeX-section-label))
+  (setq preview-auto-cache-preamble t)
 
-    (setq font-latex-fontify-script nil)
-    (setq font-latex-fontify-sectioning 'color)
-    (with-eval-after-load 'font-latex
-      (set-face-foreground 'font-latex-script-char-face nil))
+  (setq font-latex-fontify-script nil)
+  (setq font-latex-fontify-sectioning 'color)
+  (with-eval-after-load 'font-latex
+    (set-face-foreground 'font-latex-script-char-face nil))
 
-    (with-eval-after-load 'eglot
-      (add-to-list 'eglot-server-programs
-                   '(latex-mode . ("texlab"))))
+  (with-eval-after-load 'eglot
+    (add-to-list 'eglot-server-programs
+                 '(latex-mode . ("texlab"))))
 
-    (add-hook 'TeX-after-compilation-finished-functions
-              #'TeX-revert-document-buffer)
+  (add-hook 'TeX-after-compilation-finished-functions
+            #'TeX-revert-document-buffer)
 
-    (with-eval-after-load 'tex
-      (require 'pdf-sync)
-      (require 'auctex-latexmk)
-      (auctex-latexmk-setup)
+  (with-eval-after-load 'tex
+    (require 'pdf-sync)
+    (require 'auctex-latexmk)
+    (auctex-latexmk-setup)
 
-      (setq font-latex-match-reference-keywords
-            '(;; BibLaTeX.
-              ("printbibliography" "[{")
-              ("addbibresource" "[{")
-              ;; Standard commands.
-              ("cite" "[{")
-              ("citep" "[{")
-              ("citet" "[{")
-              ("Cite" "[{")
-              ("parencite" "[{")
-              ("Parencite" "[{")
-              ("footcite" "[{")
-              ("footcitetext" "[{")
-              ;; Style-specific commands.
-              ("textcite" "[{")
-              ("Textcite" "[{")
-              ("smartcite" "[{")
-              ("Smartcite" "[{")
-              ("cite*" "[{")
-              ("parencite*" "[{")
-              ("supercite" "[{")
-              ;; Qualified citation lists.
-              ("cites" "[{")
-              ("Cites" "[{")
-              ("parencites" "[{")
-              ("Parencites" "[{")
-              ("footcites" "[{")
-              ("footcitetexts" "[{")
-              ("smartcites" "[{")
-              ("Smartcites" "[{")
-              ("textcites" "[{")
-              ("Textcites" "[{")
-              ("supercites" "[{")
-              ;; Style-independent commands.
-              ("autocite" "[{")
-              ("Autocite" "[{")
-              ("autocite*" "[{")
-              ("Autocite*" "[{")
-              ("autocites" "[{")
-              ("Autocites" "[{")
-              ;; Text commands.
-              ("citeauthor" "[{")
-              ("Citeauthor" "[{")
-              ("citetitle" "[{")
-              ("citetitle*" "[{")
-              ("citeyear" "[{")
-              ("citedate" "[{")
-              ("citeurl" "[{")
-              ;; Special commands.
-              ("fullcite" "[{")
-              ;; Hyperref.
-              ("autoref" "[{")
-              ("href" "[{")
-              ("url" "[{")
-              ;; Cleveref.
-              ("cref" "{")
-              ("Cref" "{")
-              ("cpageref" "{")
-              ("Cpageref" "{")
-              ("cpagerefrange" "{")
-              ("Cpagerefrange" "{")
-              ("crefrange" "{")
-              ("Crefrange" "{")
-              ("labelcref" "{")))
+    (setq font-latex-match-reference-keywords
+          '(;; BibLaTeX.
+            ("printbibliography" "[{")
+            ("addbibresource" "[{")
+            ;; Standard commands.
+            ("cite" "[{")
+            ("citep" "[{")
+            ("citet" "[{")
+            ("Cite" "[{")
+            ("parencite" "[{")
+            ("Parencite" "[{")
+            ("footcite" "[{")
+            ("footcitetext" "[{")
+            ;; Style-specific commands.
+            ("textcite" "[{")
+            ("Textcite" "[{")
+            ("smartcite" "[{")
+            ("Smartcite" "[{")
+            ("cite*" "[{")
+            ("parencite*" "[{")
+            ("supercite" "[{")
+            ;; Qualified citation lists.
+            ("cites" "[{")
+            ("Cites" "[{")
+            ("parencites" "[{")
+            ("Parencites" "[{")
+            ("footcites" "[{")
+            ("footcitetexts" "[{")
+            ("smartcites" "[{")
+            ("Smartcites" "[{")
+            ("textcites" "[{")
+            ("Textcites" "[{")
+            ("supercites" "[{")
+            ;; Style-independent commands.
+            ("autocite" "[{")
+            ("Autocite" "[{")
+            ("autocite*" "[{")
+            ("Autocite*" "[{")
+            ("autocites" "[{")
+            ("Autocites" "[{")
+            ;; Text commands.
+            ("citeauthor" "[{")
+            ("Citeauthor" "[{")
+            ("citetitle" "[{")
+            ("citetitle*" "[{")
+            ("citeyear" "[{")
+            ("citedate" "[{")
+            ("citeurl" "[{")
+            ;; Special commands.
+            ("fullcite" "[{")
+            ;; Hyperref.
+            ("autoref" "[{")
+            ("href" "[{")
+            ("url" "[{")
+            ;; Cleveref.
+            ("cref" "{")
+            ("Cref" "{")
+            ("cpageref" "{")
+            ("Cpageref" "{")
+            ("cpagerefrange" "{")
+            ("Cpagerefrange" "{")
+            ("crefrange" "{")
+            ("Crefrange" "{")
+            ("labelcref" "{")))
 
-      (setq font-latex-match-textual-keywords
-            '(;; BibLaTeX brackets.
-              ("parentext" "{")
-              ("brackettext" "{")
-              ("hybridblockquote" "[{")
-              ;; Auxiliary commands.
-              ("textelp" "{")
-              ("textelp*" "{")
-              ("textins" "{")
-              ("textins*" "{")
-              ;; Subcaption.
-              ("subcaption" "[{")))
+    (setq font-latex-match-textual-keywords
+          '(;; BibLaTeX brackets.
+            ("parentext" "{")
+            ("brackettext" "{")
+            ("hybridblockquote" "[{")
+            ;; Auxiliary commands.
+            ("textelp" "{")
+            ("textelp*" "{")
+            ("textins" "{")
+            ("textins*" "{")
+            ;; Subcaption.
+            ("subcaption" "[{")))
 
-      (setq font-latex-match-variable-keywords
-            '(;; Amsmath.
-              ("numberwithin" "{")
-              ;; Enumitem.
-              ("setlist" "[{")
-              ("setlist*" "[{")
-              ("newlist" "{")
-              ("renewlist" "{")
-              ("setlistdepth" "{")
-              ("restartlist" "{")
-              ("crefname" "{")))
+    (setq font-latex-match-variable-keywords
+          '(;; Amsmath.
+            ("numberwithin" "{")
+            ;; Enumitem.
+            ("setlist" "[{")
+            ("setlist*" "[{")
+            ("newlist" "{")
+            ("renewlist" "{")
+            ("setlistdepth" "{")
+            ("restartlist" "{")
+            ("crefname" "{")))
 
-      (setq TeX-view-program-selection '((output-pdf "PDF Tools")))
+    (setq TeX-view-program-selection '((output-pdf "PDF Tools")))
 
-      (dolist (envpair '(("verbatim" current-indentation)
-                         ("verbatim*" current-indentation)
-                         ("filecontents" current-indentation)
-                         ("filecontents*" current-indentation)
-                         ("frame" current-indentation)
-                         ("theorem" current-indentation)
-                         ("thm" current-indentation)
-                         ("corollary" current-indentation)
-                         ("cor" current-indentation)
-                         ("lemma" current-indentation)
-                         ("lem" current-indentation)
-                         ("definition" current-indentation)
-                         ("def" current-indentation)
-                         ("assumption" current-indentation)
-                         ("asm" current-indentation)
-                         ("remark" current-indentation)
-                         ("rem" current-indentation)
-                         ("example" current-indentation)
-                         ("eg" current-indentation)
-                         ("proof" current-indentation)
-                         ("problem" current-indentation)
-                         ;; ("solution" LaTex-current-indentation)
-                         ("itemize" aar/LaTeX-indent-item)
-                         ("enumerate" aar/LaTeX-indent-item)
-                         ("description" aar/LaTeX-indent-item)))
-        (add-to-list 'LaTeX-indent-environment-list envpair))
-      )
+    (dolist (envpair '(("verbatim" current-indentation)
+                       ("verbatim*" current-indentation)
+                       ("filecontents" current-indentation)
+                       ("filecontents*" current-indentation)
+                       ("frame" current-indentation)
+                       ("theorem" current-indentation)
+                       ("thm" current-indentation)
+                       ("corollary" current-indentation)
+                       ("cor" current-indentation)
+                       ("lemma" current-indentation)
+                       ("lem" current-indentation)
+                       ("definition" current-indentation)
+                       ("def" current-indentation)
+                       ("assumption" current-indentation)
+                       ("asm" current-indentation)
+                       ("remark" current-indentation)
+                       ("rem" current-indentation)
+                       ("example" current-indentation)
+                       ("eg" current-indentation)
+                       ("proof" current-indentation)
+                       ("problem" current-indentation)
+                       ;; ("solution" LaTex-current-indentation)
+                       ("itemize" aar/LaTeX-indent-item)
+                       ("enumerate" aar/LaTeX-indent-item)
+                       ("description" aar/LaTeX-indent-item)))
+      (add-to-list 'LaTeX-indent-environment-list envpair))
     )
+  )
 
-  ;; Automatically compile on save
+;; Automatically compile on save
   ;;;###autoload
-  (defun aar/latex-default-compile-on-master ()
-    "Run `TeX-command-default' on `TeX-master' for current buffer."
-    (interactive)
-    (TeX-command TeX-command-default #'TeX-master-file))
-
-  ;;;###autoload
-  (defun aar/save-and-latex-default-compile-on-master ()
-    "Save current buffer and run `aar/latex-default-compile-on-master'."
-    (interactive)
-    (save-buffer)
-    (aar/latex-default-compile-on-master))
+(defun aar/latex-default-compile-on-master ()
+  "Run `TeX-command-default' on `TeX-master' for current buffer."
+  (interactive)
+  (TeX-command TeX-command-default #'TeX-master-file))
 
   ;;;###autoload
-  (defun aar/latex-compile-after-save-on ()
-    (interactive)
-    (add-hook 'after-save-hook #'aar/latex-default-compile-on-master 0 t))
+(defun aar/save-and-latex-default-compile-on-master ()
+  "Save current buffer and run `aar/latex-default-compile-on-master'."
+  (interactive)
+  (save-buffer)
+  (aar/latex-default-compile-on-master))
 
   ;;;###autoload
-  (defun aar/latex-compile-after-save-off ()
-    (interactive)
-    (remove-hook 'after-save-hook #'aar/latex-default-compile-on-master t))
+(defun aar/latex-compile-after-save-on ()
+  (interactive)
+  (add-hook 'after-save-hook #'aar/latex-default-compile-on-master 0 t))
 
   ;;;###autoload
-  (defun aar/LaTeX-indent-item ()
-    "Provide proper indentation for LaTeX \"itemize\",\"enumerate\", and
+(defun aar/latex-compile-after-save-off ()
+  (interactive)
+  (remove-hook 'after-save-hook #'aar/latex-default-compile-on-master t))
+
+  ;;;###autoload
+(defun aar/LaTeX-indent-item ()
+  "Provide proper indentation for LaTeX \"itemize\",\"enumerate\", and
   \"description\" environments.
 
     \"\\item\" is indented `LaTeX-indent-level' spaces relative to
@@ -1319,49 +1330,49 @@ method to prepare vterm at the corresponding remote directory."
     Continuation lines are indented either twice
     `LaTeX-indent-level', or `LaTeX-indent-level-item-continuation'
     if the latter is bound."
-    (save-match-data
-      (let* ((offset LaTeX-indent-level)
-             (contin (or (and (boundp 'LaTeX-indent-level-item-continuation)
-                              LaTeX-indent-level-item-continuation)
-                         (* 2 LaTeX-indent-level)))
-             (re-beg "\\\\begin{")
-             (re-end "\\\\end{")
-             (re-env "\\(itemize\\|\\enumerate\\|description\\)")
-             (indent (save-excursion
-                       (when (looking-at (concat re-beg re-env "}"))
-                         (end-of-line))
-                       (LaTeX-find-matching-begin)
-                       (current-column))))
-        (cond ((looking-at (concat re-beg re-env "}"))
-               (or (save-excursion
-                     (beginning-of-line)
-                     (ignore-errors
-                       (LaTeX-find-matching-begin)
-                       (+ (current-column)
-                          (if (looking-at (concat re-beg re-env "}"))
-                              contin
-                            offset))))
-                   indent))
-              ((looking-at (concat re-end re-env "}"))
-               indent)
-              ((looking-at "\\\\item")
-               (+ offset indent))
-              (t
-               (+ contin indent))))))
+  (save-match-data
+    (let* ((offset LaTeX-indent-level)
+           (contin (or (and (boundp 'LaTeX-indent-level-item-continuation)
+                            LaTeX-indent-level-item-continuation)
+                       (* 2 LaTeX-indent-level)))
+           (re-beg "\\\\begin{")
+           (re-end "\\\\end{")
+           (re-env "\\(itemize\\|\\enumerate\\|description\\)")
+           (indent (save-excursion
+                     (when (looking-at (concat re-beg re-env "}"))
+                       (end-of-line))
+                     (LaTeX-find-matching-begin)
+                     (current-column))))
+      (cond ((looking-at (concat re-beg re-env "}"))
+             (or (save-excursion
+                   (beginning-of-line)
+                   (ignore-errors
+                     (LaTeX-find-matching-begin)
+                     (+ (current-column)
+                        (if (looking-at (concat re-beg re-env "}"))
+                            contin
+                          offset))))
+                 indent))
+            ((looking-at (concat re-end re-env "}"))
+             indent)
+            ((looking-at "\\\\item")
+             (+ offset indent))
+            (t
+             (+ contin indent))))))
 
-  (defcustom LaTeX-indent-level-item-continuation 4
-    "*Indentation of continuation lines for items in itemize-like
+(defcustom LaTeX-indent-level-item-continuation 4
+  "*Indentation of continuation lines for items in itemize-like
   environments."
-    :group 'LaTeX-indentation
-    :type 'integer)
+  :group 'LaTeX-indentation
+  :type 'integer)
 
-  (aar/localleader
-    :keymaps 'LaTeX-mode-map
-    "a"  #'aar/save-and-latex-default-compile-on-master
-    "v"  #'TeX-view
-    "c"  #'TeX-clean
-    "ll" #'aar/latex-compile-after-save-on
-    "lL" #'aar/latex-compile-after-save-off)
+(aar/localleader
+  :keymaps 'LaTeX-mode-map
+  "a"  #'aar/save-and-latex-default-compile-on-master
+  "v"  #'TeX-view
+  "c"  #'TeX-clean
+  "ll" #'aar/latex-compile-after-save-on
+  "lL" #'aar/latex-compile-after-save-off)
 
 (use-package auctex-latexmk)
 

@@ -107,7 +107,7 @@
       ];
 
       # # Keep R from ever touching ~/Library/R/x.y
-      # R_LIBS_USER = "";          # disable user library
+      # R_LIBS_USER = ""; # disable user library
       # R_ENVIRON_USER = "/dev/null";
       # R_PROFILE_USER = "/dev/null";
 
@@ -122,9 +122,9 @@
 
       # # Nice-to-have: keep PATH clean
       # shellHook = ''
-      #   echo ">> Using Nix R at: $(which R)"
-      #   echo ">> .libPaths() inside R should show only nix store paths."
-      #   echo ">> User site library disabled (R_LIBS_USER empty)."
+      # echo ">> Using Nix R at: $(which R)"
+      # echo ">> .libPaths() inside R should show only nix store paths."
+      # echo ">> User site library disabled (R_LIBS_USER empty)."
       # '';
 
       fonts.packages = [
@@ -179,6 +179,7 @@
           "/Applications/Nix Apps/Skim.app"
           "/Applications/Nix Apps/Emacs.app"
           "/Applications/Nix Apps/Wezterm.app"
+          "/Applications/Nix Apps/Ghostty.app"
           "/System/Applications/Utilities/Activity Monitor.app"
         ];
         finder.AppleShowAllExtensions = true;

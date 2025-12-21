@@ -9,6 +9,7 @@ source <(fzf --zsh)
 # alias ls='eza --color=auto'
 alias ll='eza -alhF --color=auto --group-directories-first'
 alias cat='bat'
+alias drs-mbaw='sudo darwin-rebuild switch --flake .#mb-air-work'
 
 # export FONTCONFIG_FILE=$(nix-build -E 'let pkgs = import <nixpkgs> { }; in pkgs.makeFontsConf { fontDirectories = [ pkgs.freefont_ttf ]; }')
 
