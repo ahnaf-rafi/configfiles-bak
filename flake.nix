@@ -6,6 +6,10 @@
     nix-darwin.url = "github:nix-darwin/nix-darwin/master";
     nix-darwin.inputs.nixpkgs.follows = "nixpkgs";
     neovim-nightly.url = "github:nix-community/neovim-nightly-overlay";
+    emacs-overlay = {
+      url = "github:nix-community/emacs-overlay";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
     nix-homebrew.url = "github:zhaofengli/nix-homebrew";
     homebrew-core = {
       url = "github:homebrew/homebrew-core";
@@ -17,18 +21,31 @@
     };
   };
 
-  outputs = inputs@{
-    self, nixpkgs, nix-darwin, neovim-nightly,
-    nix-homebrew, homebrew-core, homebrew-cask
-  }:
+  outputs = {
+    self, nixpkgs, nix-darwin, neovim-nightly, emacs-overlay,
+    nix-homebrew, homebrew-core, homebrew-cask, ...
+  }@inputs:
   let
     configuration = { config, lib, pkgs, ... }: {
-      nix.enable = false;
+      nix = {
+       enable = false;
+       nixPath = [ "nixpkgs=${inputs.nixpkgs}" ];
+      };
       # services.nix-daemon.enable = true;
-      nixpkgs.config.allowUnfree = true;
+      nixpkgs = {
+        hostPlatform = "aarch64-darwin";
+        overlays = [
+          inputs.neovim-nightly.overlays.default
+          inputs.emacs-overlay.overlays.default
+        ];
+        config = {
+          allowUnfree = true;
+          allowUnfreePredicate = _: true;
+        };
+      };
 
-      # The platform the configuration will be used on.
-      nixpkgs.hostPlatform = "aarch64-darwin";
+      programs.man.enable = true;
+      documentation.man.enable = true;
 
       # List packages installed in system profile. To search by name, run:
       # $ nix-env -qaP | grep wget
@@ -63,23 +80,94 @@
         pkgs.delta
         ((pkgs.emacsPackagesFor pkgs.emacs).emacsWithPackages (
           epkgs: [
-            epkgs.pdf-tools
+            epkgs.gcmh
+            epkgs.exec-path-from-shell
+            epkgs.nerd-icons
+            epkgs.hl-todo
+            epkgs.which-key
+            epkgs.evil
+            epkgs.evil-collection
+            epkgs.evil-escape
+            epkgs.general
+            epkgs.dashboard
+            epkgs.doom-modeline
+            epkgs.procress
+            epkgs.nerd-icons-ibuffer
+            epkgs.vertico
+            epkgs.consult
+            epkgs.marginalia
+            epkgs.orderless
+            epkgs.corfu
+            epkgs.cape
+            epkgs.nerd-icons-completion
+            epkgs.dirvish
+            epkgs.nerd-icons-dired
+            epkgs.helpful
+            epkgs.elisp-demos
+            epkgs.adaptive-wrap
+            epkgs.evil-surround
+            epkgs.yasnippet
+            epkgs.evil-snipe
+            epkgs.evil-traces
+            epkgs.anzu
+            epkgs.evil-anzu
+            epkgs.magit
+            epkgs.git-gutter
+            epkgs.consult-eglot
+            # TODO: Check if needed --- remove if not
+            epkgs.treesit-auto
+            epkgs.treesit-grammars.with-all-grammars
+            # epkgs.treesit-grammars.with-grammars (g: [
+            #   g.tree-sitter-nix
+            #   g.tree-sitter-markdown
+            #   g.tree-sitter-latex
+            #   g.tree-sitter-typst
+            #   g.tree-sitter-python
+            #   g.tree-sitter-r
+            #   g.tree-sitter-julia
+            #   g.tree-sitter-c
+            #   g.tree-sitter-cpp
+            # ])
+            epkgs.spell-fu
+            # epkgs.flyspell-lazy
+            # epkgs.flyspell-correct
             epkgs.vterm
+            epkgs.pdf-tools
+            epkgs.nov
+            epkgs.olivetti
+            epkgs.julia-mode
+            epkgs.julia-ts-mode
+            epkgs.julia-repl
+            # TODO: Explore as possible replacement for julia-repl.
+            # epkgs.julia-vterm
+            epkgs.eglot-jl
+            epkgs.ess
+            epkgs.ess-view-data
+            # TODO: Possibly consider the following for STATA highlighting
+            # epkgs.ado-mode
+            epkgs.lua-mode
+            epkgs.nix-ts-mode
+            epkgs.matlab-mode
+            epkgs.vimrc-mode
+            epkgs.typst-ts-mode
+            epkgs.typst-preview
+            epkgs.websocket
             epkgs.auctex
+            epkgs.evil-tex
+            epkgs.auctex-latexmk
             epkgs.auctex-cont-latexmk
             epkgs.auctex-label-numbers
             epkgs.preview-auto
             epkgs.preview-tailor
-            epkgs.eglot-jl
-            epkgs.julia-ts-mode
-            epkgs.nerd-icons
-            epkgs.nerd-icons-dired
-            epkgs.nerd-icons-ibuffer
+            epkgs.ebib
+            epkgs.markdown-mode
+            epkgs.polymode
+            epkgs.poly-markdown
+            epkgs.poly-R
+
             epkgs.nerd-icons-completion
             epkgs.nerd-icons-corfu
             epkgs.doom-themes
-            epkgs.gcmh
-            epkgs.exec-path-from-shell
           ]
         ))
 
@@ -106,6 +194,8 @@
         pkgs.sioyek
 
         pkgs.lynx
+
+        pkgs.dbus
       ];
 
       # # Keep R from ever touching ~/Library/R/x.y
@@ -128,6 +218,35 @@
       # echo ">> .libPaths() inside R should show only nix store paths."
       # echo ">> User site library disabled (R_LIBS_USER empty)."
       # '';
+
+      # Ensure required runtime dirs + machine-id exist
+      system.activationScripts.dbus.text = ''
+        /bin/mkdir -p /var/run/dbus
+    /bin/mkdir -p /var/lib/dbus
+    ${pkgs.dbus}/bin/dbus-uuidgen --ensure=/var/lib/dbus/machine-id
+      '';
+
+      system.activationScripts.machineId.text = ''
+        if [ ! -f /etc/machine-id ]; then
+      ${pkgs.dbus}/bin/dbus-uuidgen --ensure=/etc/machine-id
+    fi
+
+    /bin/mkdir -p /var/lib/dbus
+    /bin/ln -sf /etc/machine-id /var/lib/dbus/machine-id
+      '';
+
+      launchd.daemons.dbus = {
+        command = "${pkgs.dbus}/bin/dbus-daemon --system --nofork --nopidfile";
+
+        serviceConfig = {
+          KeepAlive = true;
+          RunAtLoad = true;
+
+          # Optional but common:
+          StandardOutPath = "/var/log/dbus.log";
+          StandardErrorPath = "/var/log/dbus.log";
+        };
+      };
 
       fonts.packages = [
         pkgs.julia-mono

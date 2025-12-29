@@ -281,7 +281,7 @@ vim.api.nvim_create_autocmd("LspAttach", {
   end
 })
 
-vim.lsp.enable({"lua_ls", "texlab", "tinymist", "julials"})
+vim.lsp.enable({ "nixd", "lua_ls", "texlab", "tinymist", "julials"})
 
 vim.lsp.config("lua_ls", {
   settings = {
@@ -291,6 +291,28 @@ vim.lsp.config("lua_ls", {
       }
     }
   }
+})
+
+vim.lsp.config("nixd", {
+  cmd = { "nixd" },
+  settings = {
+    nixd = {
+      nixpkgs = {
+        expr = "import <nixpkgs> { }",
+      },
+      formatting = {
+        command = { "nixfmt" }, -- or nixfmt or nixpkgs-fmt
+      },
+      -- options = {
+      --   nixos = {
+      --       expr = '(builtins.getFlake "/PATH/TO/FLAKE").nixosConfigurations.CONFIGNAME.options',
+      --   },
+      --   home_manager = {
+      --       expr = '(builtins.getFlake "/PATH/TO/FLAKE").homeConfigurations.CONFIGNAME.options',
+      --   },
+      -- },
+    },
+  },
 })
 
 vim.lsp.config("tinymist", {

@@ -39,17 +39,13 @@
             (list ".*" auto-save-list-file-prefix t)))
 
 (require 'package)
-(add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/"))
+;; (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/"))
 
 (package-initialize)
-(unless package-archive-contents
-  (package-refresh-contents))
+;; (unless package-archive-contents
+;;   (package-refresh-contents))
 
-;; Install use-package if not present.
-(unless (package-installed-p 'use-package)
-  (package-install 'use-package))
-
-(setq use-package-always-ensure t)
+;; (setq use-package-always-ensure t)
 (setq use-package-always-defer t)
 
 (require 'use-package)
@@ -87,18 +83,23 @@
   (add-hook hook #'display-line-numbers-mode)
   (add-hook hook #'display-fill-column-indicator-mode))
 
-(defvar aar/use-dark-theme nil
+(defvar aar/use-dark-theme t
   "Use dark theme if `t' otherwise, use light theme")
 
 (mapc #'disable-theme custom-enabled-themes)
 (require-theme 'modus-themes)
 (setq modus-themes-org-blocks 'gray-background)
 (setq modus-themes-disable-other-themes t)
-;; (setq doom-gruvbox-dark-variant "hard")
 
-(if aar/use-dark-theme
-    (modus-themes-load-theme 'modus-vivendi-tinted)
-  (modus-themes-load-theme 'modus-operandi-tinted))
+ (if aar/use-dark-theme
+     (modus-themes-load-theme 'modus-vivendi-tinted)
+   (modus-themes-load-theme 'modus-operandi-tinted))
+
+;; (setq doom-gruvbox-dark-variant "hard")
+;;
+;; (if aar/use-dark-theme
+;;     (load-theme 'doom-gruvbox t)
+;;   (load-theme 'doom-gruvbox-light t))
 
 (use-package hl-todo
   :init
@@ -285,7 +286,7 @@
   )
 
 (use-package procress
-  :vc (:url "https://github.com/haji-ali/procress")
+  ;; :vc (:url "https://github.com/haji-ali/procress")
   :commands procress-auctex-mode
   :init
   (add-hook 'LaTeX-mode-hook #'procress-auctex-mode)
@@ -448,26 +449,59 @@
 
 (setq insert-directory-program "ls"
       dired-use-ls-dired nil)
-(setq dired-listing-switches "-agho --group-directories-first")
+(setq dired-kill-when-opening-new-dired-buffer t)
+(setq dired-listing-switches "-alh --group-directories-first  --no-group")
 (add-hook 'dired-mode-hook #'display-line-numbers-mode)
 (add-hook 'dired-mode-hook #'display-fill-column-indicator-mode)
+(put 'dired-find-alternate-file 'disabled nil)
 
-(use-package nerd-icons-dired
-  :hook (dired-mode . nerd-icons-dired-mode))
-
-(use-package dired-single
-  :vc (:url "https://github.com/emacsattic/dired-single")
+(use-package dirvish
+  :custom
+  (dirvish-quick-access-entries ; It's a custom option, `setq' won't work
+   '(("h" "~/"                          "Home")
+     ("d" "~/Downloads/"                "Downloads")
+     ("m" "/mnt/"                       "Drives")
+     ("s" "/ssh:my-remote-server")      "SSH server"
+     ("e" "/sudo:root@localhost:/etc")  "Modify program settings"
+     ("t" "~/.local/share/Trash/files/" "TrashCan")))
   :init
-  (with-eval-after-load 'dired
-    (require 'dired-x)
-    (define-key dired-mode-map [remap dired-find-file] #'dired-single-buffer)
-    (define-key dired-mode-map [remap dired-mouse-find-file-other-window]
-		            #'dired-single-buffer-mouse)
-    (define-key dired-mode-map [remap dired-up-directory]
-                #'dired-single-up-directory)
-    (evil-define-key '(normal visual motion) dired-mode-map
-      (kbd "h") #'dired-single-up-directory
-      (kbd "l") #'dired-single-buffer)))
+  (dirvish-override-dired-mode)
+  :config
+  ;; (dirvish-peek-mode)             ; Preview files in minibuffer
+  ;; (dirvish-side-follow-mode)      ; similar to `treemacs-follow-mode'
+  (setq dirvish-mode-line-format
+        '(:left (sort symlink) :right (omit yank index)))
+  (setq dirvish-attributes           ; The order *MATTERS* for some attributes
+        '(vc-state subtree-state nerd-icons collapse file-time file-size)
+        dirvish-side-attributes
+        '(vc-state nerd-icons collapse file-size))
+  ;; open large directory (over 20000 files) asynchronously with `fd' command
+  (setq dirvish-large-directory-threshold 20000)
+  (evil-define-key '(normal visual motion) dired-mode-map
+    (kbd "h") #'dired-up-directory
+    (kbd "l") #'dired-find-file)
+  ;; :bind ; Bind `dirvish-fd|dirvish-side|dirvish-dwim' as you see fit
+  ;; (("C-c f" . dirvish)
+  ;;  :map dirvish-mode-map               ; Dirvish inherits `dired-mode-map'
+  ;;  (";"   . dired-up-directory)        ; So you can adjust `dired' bindings here
+  ;;  ("?"   . dirvish-dispatch)          ; [?] a helpful cheatsheet
+  ;;  ("a"   . dirvish-setup-menu)        ; [a]ttributes settings:`t' toggles mtime, `f' toggles fullframe, etc.
+  ;;  ("f"   . dirvish-file-info-menu)    ; [f]ile info
+  ;;  ("o"   . dirvish-quick-access)      ; [o]pen `dirvish-quick-access-entries'
+  ;;  ("s"   . dirvish-quicksort)         ; [s]ort flie list
+  ;;  ("r"   . dirvish-history-jump)      ; [r]ecent visited
+  ;;  ;; ("l"   . dirvish-ls-switches-menu)  ; [l]s command flags
+  ;;  ("l"   . dired-find-file)  ; [l]s command flags
+  ;;  ("v"   . dirvish-vc-menu)           ; [v]ersion control commands
+  ;;  ("*"   . dirvish-mark-menu)
+  ;;  ("y"   . dirvish-yank-menu)
+  ;;  ("N"   . dirvish-narrow)
+  ;;  ("^"   . dirvish-history-last)
+  ;;  ("TAB" . dirvish-subtree-toggle)
+  ;;  ("M-f" . dirvish-history-go-forward)
+  ;;  ("M-b" . dirvish-history-go-backward)
+  ;;  ("M-e" . dirvish-emerge-menu))
+  )
 
 (require 'recentf)
 (setq recentf-max-saved-items 50)
@@ -841,27 +875,9 @@ DIR must include a .project file to be considered a project."
   (setq ispell-local-dictionary-alist `((nil "[[:alpha:]]" "[^[:alpha:]]"
                                              "['\x2019]" nil ("-B") nil utf-8))))
 
-(use-package flyspell
+(use-package spell-fu
   :init
-  (setq flyspell-issue-welcome-flag nil
-        ;; Significantly speeds up flyspell, which would otherwise print
-        ;; messages for every word when checking the entire buffer
-        flyspell-issue-message-flag nil)
-
-  (add-hook 'text-mode-hook #'flyspell-mode))
-
-(use-package flyspell-lazy
-  :after flyspell
-  :config
-  (setq flyspell-lazy-idle-seconds 1
-        flyspell-lazy-window-idle-seconds 3)
-  (flyspell-lazy-mode +1))
-
-(use-package flyspell-correct
-  :commands flyspell-correct-previous
-  :general
-  (:keymaps 'flyspell-mode-map
-	    [remap ispell-word] #'flyspell-correct-wrapper))
+  (add-hook 'text-mode-hook #'spell-fu-mode))
 
 (use-package vterm
   :init
@@ -945,6 +961,7 @@ method to prepare vterm at the corresponding remote directory."
     (kbd "K")   #'pdf-view-previous-page-command
     (kbd "a")   #'pdf-view-fit-height-to-window
     (kbd "s")   #'pdf-view-fit-width-to-window
+    (kbd "y")   #'pdf-view-kill-ring-save
     (kbd "L")   #'image-eob
     (kbd "o")   #'pdf-outline
     (kbd "TAB") #'pdf-outline)
@@ -1082,14 +1099,17 @@ method to prepare vterm at the corresponding remote directory."
 (add-hook 'lua-mode-hook #'aar/lua-mode-h)
 
 (use-package nix-ts-mode
-  :mode "\\.nix\\'")
+  :mode "\\.nix\\'"
+  :init
+  (with-eval-after-load 'eglot
+    (add-to-list 'eglot-server-programs
+                 '(nix-ts-mode . ("nixd")))))
 
 (use-package matlab-mode)
 
 (use-package vimrc-mode)
 
 (use-package typst-ts-mode
-  :vc (:url "https://codeberg.org/meow_king/typst-ts-mode")
   :custom
   ;; don't add "--open" if you'd like `watch` to be an error detector
   (typst-ts-mode-watch-options "--open")
@@ -1115,7 +1135,7 @@ method to prepare vterm at the corresponding remote directory."
 (use-package websocket)
 
 (use-package typst-preview
-  :vc (:url "https://github.com/havarddj/typst-preview.el" :branch "main" :rev :rewest)
+  ;; :vc (:url "https://github.com/havarddj/typst-preview.el" :branch "main" :rev :newest)
   :init
   (require 'typst-preview)
   ;; default is "default"

@@ -27,15 +27,15 @@
 ;; Use y/n responses to yes/no prompts.
 (fset 'yes-or-no-p 'y-or-n-p)
 
-;; Suppress annoying native compilation warnings.
+;; Disable JIT compilation --- nix should be compiling packages now.
 (setq native-comp-async-report-warnings-errors nil)
+;; (setq native-comp-jit-compilation nil)
 
 ;; Set driver options for native compilation if using MacOS.
 (when (eq system-type 'darwin)
-  (setq native-comp-driver-options '("-Wl,-w"))
+  ;; (setq native-comp-driver-options '("-Wl,-w"))
   (setq native-comp-compiler (or (executable-find "clang")
-                                 native-comp-compiler))
-  )
+                                 native-comp-compiler)))
 
 (provide 'early-init)
 ;;; early-init.el ends here
