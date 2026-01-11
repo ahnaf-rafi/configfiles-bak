@@ -15,6 +15,9 @@
 (setq initial-scratch-message nil)
 (advice-add #'display-startup-echo-area-message :override #'ignore)
 
+;; Disable package.el
+(setq package-enable-at-startup nil)
+
 ;; Increase garbage collection threshold - has some performance benefit.
 (setq gc-cons-threshold (* 50 1024 1024)) ;; 50mb
 
@@ -27,14 +30,14 @@
 ;; Use y/n responses to yes/no prompts.
 (fset 'yes-or-no-p 'y-or-n-p)
 
-;; Disable JIT compilation --- nix should be compiling packages now.
+;; ;; Disable JIT compilation --- nix should be compiling packages now.
 ;; (setq native-comp-async-report-warnings-errors nil)
 ;; (setq native-comp-jit-compilation nil)
 
-;; ;; Set driver options for native compilation if using MacOS.
-;; (when (eq system-type 'darwin)
-;;   (setq native-comp-compiler (or (executable-find "clang")
-;;                                  native-comp-compiler)))
+;; Modifier kys for OSX
+(when (eq system-type 'darwin)
+  (setq mac-command-modifier 'meta)
+  (setq mac-option-modifier 'option))
 
 (provide 'early-init)
 ;;; early-init.el ends here

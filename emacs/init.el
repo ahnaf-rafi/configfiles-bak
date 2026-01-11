@@ -38,14 +38,7 @@
                   (concat auto-save-list-file-prefix "tramp-\\2") t)
             (list ".*" auto-save-list-file-prefix t)))
 
-(require 'package)
-;; (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/"))
-
-(package-initialize)
-;; (unless package-archive-contents
-;;   (package-refresh-contents))
-
-;; (setq use-package-always-ensure t)
+(setq use-package-always-ensure t)
 (setq use-package-always-defer t)
 
 (require 'use-package)
@@ -94,12 +87,6 @@
  (if aar/use-dark-theme
      (modus-themes-load-theme 'modus-vivendi-tinted)
    (modus-themes-load-theme 'modus-operandi-tinted))
-
-;; (setq doom-gruvbox-dark-variant "hard")
-;;
-;; (if aar/use-dark-theme
-;;     (load-theme 'doom-gruvbox t)
-;;   (load-theme 'doom-gruvbox-light t))
 
 (use-package hl-todo
   :init
@@ -281,9 +268,7 @@
 (use-package doom-modeline
   :init
   (setq doom-modeline-buffer-file-name-style 'file-name)
-  (doom-modeline-mode 1)
-
-  )
+  (doom-modeline-mode 1))
 
 (use-package procress
   ;; :vc (:url "https://github.com/haji-ali/procress")
@@ -509,7 +494,8 @@
 (setq recentf-auto-cleanup (if (daemonp) 300))
 (add-to-list 'recentf-exclude "^/\\(?:ssh\\|su\\|sudo\\)?:")
 (recentf-mode 1)
-(add-hook 'find-file-hook #'recentf-save-list)
+;; (add-hook 'find-file-hook #'recentf-save-list)
+(run-at-time nil 600 'recentf-save-list)
 
 ;; Insert file names from minibuffer
 ;;;###autoload
@@ -864,21 +850,6 @@ DIR must include a .project file to be considered a project."
 (aar/leader
   "a" '(nil :which-key "apps"))
 
-(use-package ispell
-  :init
-  (setq ispell-program-name "aspell")
-  (setq ispell-extra-args '("--sug-mode=ultra"
-                            "--run-together"))
-  (setq ispell-dictionary "english")
-  (setq ispell-personal-dictionary
-        (expand-file-name "ispell_personal" user-emacs-directory))
-  (setq ispell-local-dictionary-alist `((nil "[[:alpha:]]" "[^[:alpha:]]"
-                                             "['\x2019]" nil ("-B") nil utf-8))))
-
-(use-package spell-fu
-  :init
-  (add-hook 'text-mode-hook #'spell-fu-mode))
-
 (use-package vterm
   :init
   (setq vterm-always-compile-module t)
@@ -896,15 +867,15 @@ method to prepare vterm at the corresponding remote directory."
              (tramp-tramp-file-p default-directory))
     (message "default-directory is %s" default-directory)
     (with-parsed-tramp-file-name default-directory path
-                                 (let ((method (cadr (assoc `tramp-login-program
-                                                            (assoc path-method tramp-methods)))))
-                                   (vterm-send-string
-                                    (concat method " "
-                                            (when path-user (concat path-user "@")) path-host))
-                                   (vterm-send-return)
-                                   (vterm-send-string
-                                    (concat "cd " path-localname))
-                                   (vterm-send-return)))))
+      (let ((method (cadr (assoc `tramp-login-program
+                                 (assoc path-method tramp-methods)))))
+        (vterm-send-string
+         (concat method " "
+                 (when path-user (concat path-user "@")) path-host))
+        (vterm-send-return)
+        (vterm-send-string
+         (concat "cd " path-localname))
+        (vterm-send-return)))))
 
 ;;;###autoload
 (defun aar/vterm-here-other-window (&optional arg)

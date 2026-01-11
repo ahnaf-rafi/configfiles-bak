@@ -1,0 +1,503 @@
+#+title: Emacs Configuration
+#+author: Ahnaf Rafi
+#+property: header-args:emacs-lisp  :tangle init.el
+#+startup: overview
+
+* How this configuration works.
+When ~init.org~ is changed and saved, its Emacs Lisp (~elisp~) source code
+block get tangled (written) to ~early-init.el~ or ~init.el~.
+These source files are symlinked to ~$HOME/.emacs.d~ by ~stow~.
+The automatic tangling is done using a local hook; the end of ~init.org~ (see
+bottom of raw file) has the following comment block:
+#+begin_src org :tangle no
+# Local Variables:
+# eval: (add-hook 'after-save-hook #'org-babel-tangle nil t)
+# End:
+#+end_src
+
+* The early init file
+#+begin_src emacs-lisp :tangle early-init.el
+;;; early-init.el --- -*- lexical-binding: t; -*-
+
+;;; Code:
+
+;; Disable GUI elements I don't use.
+(menu-bar-mode -1)
+(tool-bar-mode -1)
+(scroll-bar-mode -1)
+
+;; Get rid of splash screen.
+(setq inhibit-splash-screen t)
+(setq inhibit-startup-echo-area-message user-login-name) ;; Read docstring.
+(setq inhibit-startup-screen t)
+(setq inhibit-startup-buffer-menu nil)
+(setq initial-scratch-message nil)
+(advice-add #'display-startup-echo-area-message :override #'ignore)
+
+;; Disable package.el
+(setq package-enable-at-startup nil)
+
+;; Increase garbage collection threshold - has some performance benefit.
+(setq gc-cons-threshold (* 50 1024 1024)) ;; 50mb
+
+;; Useful for dealing with language servers using eglot.
+(setq read-process-output-max (* 1024 1024)) ;; 1mb
+
+;; Inhibit frame resize - has some performance benefit.
+(setq frame-inhibit-implied-resize t)
+
+;; Use y/n responses to yes/no prompts.
+(fset 'yes-or-no-p 'y-or-n-p)
+
+;; ;; Disable JIT compilation --- nix should be compiling packages now.
+;; (setq native-comp-async-report-warnings-errors nil)
+;; (setq native-comp-jit-compilation nil)
+
+;; Modifier kys for OSX
+(when (eq system-type 'darwin)
+  (setq mac-command-modifier 'meta)
+  (setq mac-option-modifier 'option))
+
+(provide 'early-init)
+;;; early-init.el ends here
+#+end_src
+
+* Main init file: header and some basics
+#+begin_src emacs-lisp
+;;; init.el --- -*- lexical-binding: t; -*-
+
+;;; Code:
+
+;; Name and email.
+(setq user-full-name "Ahnaf Rafi")
+(setq user-mail-address "ahnaf.al.rafi@gmail.com")
+
+;; Set file for custom.el to use --- I use this for temporary customizations.
+(setq custom-file (expand-file-name "custom.el" user-emacs-directory))
+;; Load the custom file.
+(load custom-file 'noerror 'nomessage)
+
+;; Add user lisp directory to load path.
+(add-to-list 'load-path (expand-file-name "lisp" user-emacs-directory))
+
+(require 'aar-packages)
+#+end_src
+
+* TODO Refactor
+#+begin_src emacs-lisp :tangle no
+;; Clipboard/kill-ring --- do not keep duplicates.
+(setq kill-do-not-save-duplicates t)
+
+;; Disable the alarm bell
+(setq ring-bell-function 'ignore)
+
+;; For mouse events
+(setq use-dialog-box nil)
+(setq use-file-dialog nil)
+
+;; Disable backups and lockfiles
+(setq make-backup-files nil)
+(setq create-lockfiles nil)
+
+;; Enable auto-saves
+(setq auto-save-default t)
+
+;; Auto-save transforms
+(setq auto-save-file-name-transforms
+      (list (list "\\`/[^/]*:\\([^/]*/\\)*\\([^/]*\\)\\'"
+                                        ; Prefix tramp auto-saves to prevent conflicts
+                  (concat auto-save-list-file-prefix "tramp-\\2") t)
+            (list ".*" auto-save-list-file-prefix t)))
+
+
+;; Dealing with Xressources - i.e. don't bother, ignore.
+(setq inhibit-x-resources t)
+
+;; Cursor, tooltip and dialog box
+(when (fboundp 'blink-cursor-mode)
+  (blink-cursor-mode -1))
+(setq visible-cursor nil)
+(setq use-dialog-box nil)
+(setq x-gtk-use-system-tooltips nil)
+(when (fboundp 'tooltip-mode)
+  (tooltip-mode -1))
+#+end_src
+
+* Package management
+#+begin_src emacs-lisp :tangle lisp/aar-packages.el
+;;; aar-packages.el --- -*- lexical-binding: t; -*-
+
+;;; Code:
+(defvar elpaca-installer-version 0.11)
+(defvar elpaca-directory (expand-file-name "elpaca/" user-emacs-directory))
+(defvar elpaca-builds-directory (expand-file-name "builds/" elpaca-directory))
+(defvar elpaca-repos-directory (expand-file-name "repos/" elpaca-directory))
+(defvar elpaca-order '(elpaca :repo "https://github.com/progfolio/elpaca.git"
+                              :ref nil :depth 1 :inherit ignore
+                              :files (:defaults "elpaca-test.el" (:exclude "extensions"))
+                              :build (:not elpaca--activate-package)))
+(let* ((repo  (expand-file-name "elpaca/" elpaca-repos-directory))
+       (build (expand-file-name "elpaca/" elpaca-builds-directory))
+       (order (cdr elpaca-order))
+       (default-directory repo))
+  (add-to-list 'load-path (if (file-exists-p build) build repo))
+  (unless (file-exists-p repo)
+    (make-directory repo t)
+    (when (<= emacs-major-version 28) (require 'subr-x))
+    (condition-case-unless-debug err
+        (if-let* ((buffer (pop-to-buffer-same-window "*elpaca-bootstrap*"))
+                  ((zerop (apply #'call-process `("git" nil ,buffer t "clone"
+                                                  ,@(when-let* ((depth (plist-get order :depth)))
+                                                      (list (format "--depth=%d" depth) "--no-single-branch"))
+                                                  ,(plist-get order :repo) ,repo))))
+                  ((zerop (call-process "git" nil buffer t "checkout"
+                                        (or (plist-get order :ref) "--"))))
+                  (emacs (concat invocation-directory invocation-name))
+                  ((zerop (call-process emacs nil buffer nil "-Q" "-L" "." "--batch"
+                                        "--eval" "(byte-recompile-directory \".\" 0 'force)")))
+                  ((require 'elpaca))
+                  ((elpaca-generate-autoloads "elpaca" repo)))
+            (progn (message "%s" (buffer-string)) (kill-buffer buffer))
+          (error "%s" (with-current-buffer buffer (buffer-string))))
+      ((error) (warn "%s" err) (delete-directory repo 'recursive))))
+  (unless (require 'elpaca-autoloads nil t)
+    (require 'elpaca)
+    (elpaca-generate-autoloads "elpaca" repo)
+    (let ((load-source-file-function nil)) (load "./elpaca-autoloads"))))
+(add-hook 'after-init-hook #'elpaca-process-queues)
+(elpaca `(,@elpaca-order))
+
+;; Install use-package support
+(elpaca elpaca-use-package
+  ;; Enable use-package :ensure support for Elpaca.
+  (elpaca-use-package-mode))
+
+(setq use-package-always-ensure t)
+(setq use-package-always-defer t)
+
+(provide 'aar-packages)
+;;; aar-packages.el ends here
+#+end_src
+
+* ~gcmh~
+#+begin_src emacs-lisp
+(use-package gcmh
+  :init
+  (setq gcmh-idle-delay 5)
+  (setq gcmh-high-cons-threshold (* 100 1024 1024))
+  (setq gcmh-verbose init-file-debug)
+  (gcmh-mode 1))
+#+end_src
+
+* ~exec-path-from-shell~
+#+begin_src emacs-lisp
+(use-package exec-path-from-shell
+  :init
+  (exec-path-from-shell-initialize))
+#+end_src
+
+* Visuals
+** Font
+#+begin_src emacs-lisp
+(add-to-list 'default-frame-alist '(font . "JuliaMono-14.0"))
+(set-face-attribute 'default nil :font "JuliaMono-14.0")
+#+end_src
+
+** Tweaks to defaults
+#+begin_src emacs-lisp
+;; Dealing with Xressources - i.e. don't bother, ignore.
+(setq inhibit-x-resources t)
+
+;; Cursor, tooltip and dialog box
+(when (fboundp 'blink-cursor-mode)
+  (blink-cursor-mode -1))
+(setq visible-cursor nil)
+(setq use-dialog-box nil)
+(setq x-gtk-use-system-tooltips nil)
+(when (fboundp 'tooltip-mode)
+  (tooltip-mode -1))
+#+end_src
+
+** Line numbers and fill-column indicator
+I like line numbers pretty much everywhere.
+#+begin_src emacs-lisp
+(setq display-line-numbers-type 'visual)
+(dolist (hook '(prog-mode-hook text-mode-hook))
+  (add-hook hook #'display-line-numbers-mode)
+  (add-hook hook #'display-fill-column-indicator-mode))
+#+end_src
+
+** Theme
+Let's define a variable that tells Emacs whether a dark or light theme will be
+used.
+#+begin_src emacs-lisp
+(defvar aar/use-dark-theme t
+  "Use dark theme if `t' otherwise, use light theme")
+#+end_src
+I like [[https://protesilaos.com/emacs/modus-themes][Protesilaos Stavrou's Modus
+Themes]]; these are both great and built in to more recent versions of
+Emacs.
+The following snippet loads the a variant according to ~aar/use-dark-theme~.
+#+begin_src emacs-lisp
+(mapc #'disable-theme custom-enabled-themes)
+(require-theme 'modus-themes)
+(setq modus-themes-org-blocks 'gray-background)
+(setq modus-themes-disable-other-themes t)
+
+ (if aar/use-dark-theme
+     (modus-themes-load-theme 'modus-vivendi-tinted)
+   (modus-themes-load-theme 'modus-operandi-tinted))
+#+end_src
+
+** ~hl-todo~
+This adds additional highlighting for TODO keywords.
+#+begin_src emacs-lisp
+(use-package hl-todo
+  :init
+  (dolist (hook '(prog-mode-hook tex-mode-hook markdown-mode-hook))
+    (add-hook hook #'hl-todo-mode))
+
+  ;; Stolen from doom-emacs: modules/ui/hl-todo/config.el
+  (setq hl-todo-highlight-punctuation ":")
+  (setq hl-todo-keyword-faces
+        '(;; For reminders to change or add something at a later date.
+          ("TODO" warning bold)
+          ;; For code (or code paths) that are broken, unimplemented, or slow,
+          ;; and may become bigger problems later.
+          ("FIXME" error bold)
+          ;; For code that needs to be revisited later, either to upstream it,
+          ;; improve it, or address non-critical issues.
+          ("REVIEW" font-lock-keyword-face bold)
+          ;; For code smells where questionable practices are used
+          ;; intentionally, and/or is likely to break in a future update.
+          ("HACK" font-lock-constant-face bold)
+          ;; For sections of code that just gotta go, and will be gone soon.
+          ;; Specifically, this means the code is deprecated, not necessarily
+          ;; the feature it enables.
+          ("DEPRECATED" font-lock-doc-face bold)
+          ;; Extra keywords commonly found in the wild, whose meaning may vary
+          ;; from project to project.
+          ("NOTE" success bold)
+          ("BUG" error bold)
+          ("XXX" font-lock-constant-face bold))))
+#+end_src
+
+** Icons with ~nerd-icons.el~
+#+begin_src emacs-lisp
+(use-package nerd-icons)
+#+end_src
+
+* Keybindings
+** ~which-key~
+#+begin_src emacs-lisp
+(use-package which-key
+  :demand t
+  :init
+  (setq which-key-idle-delay 0.3)
+  (setq which-key-allow-evil-operators t)
+  (which-key-setup-minibuffer)
+  (which-key-mode))
+#+end_src
+
+** ~evil~
+Yeah, I'm one of those.
+#+begin_src emacs-lisp
+(use-package evil
+  :demand t
+  :init
+  (setq evil-want-integration t)
+  (setq evil-want-keybinding nil)
+  (setq evil-want-C-u-scroll t)
+  (setq evil-want-C-u-delete t)
+  (setq evil-want-C-i-jump nil)
+  (setq evil-want-visual-char-semi-exclusive t)
+  (setq evil-ex-search-vim-style-regexp t)
+  (setq evil-ex-visual-char-range t)
+  (setq evil-respect-visual-line-mode t)
+  (setq evil-mode-line-format 'nil)
+  (setq evil-symbol-word-search t)
+  (setq evil-ex-interactive-search-highlight 'selected-window)
+  (setq evil-kbd-macro-suppress-motion-error t)
+  (setq evil-split-window-below t)
+  (setq evil-vsplit-window-right t)
+  (setq evil-flash-timer nil)
+  (setq evil-complete-all-buffers nil)
+  (evil-mode 1)
+  (evil-set-initial-state 'messages-buffer-mode 'normal)
+  :config
+  (evil-define-key 'visual 'global
+    (kbd "<") #'aar/evil-visual-dedent
+    (kbd ">") #'aar/evil-visual-indent)
+  (evil-define-key '(normal visual motion) 'global
+    (kbd "] m") #'aar/next-beginning-of-method
+    (kbd "[ m") #'aar/previous-beginning-of-method
+    (kbd "] M") #'aar/next-end-of-method
+    (kbd "[ M") #'aar/previous-end-of-method))
+#+end_src
+
+** ~evil-collection~
+#+begin_src emacs-lisp
+(use-package evil-collection
+  :demand t
+  :init
+  (setq evil-collection-outline-bind-tab-p nil)
+  (setq evil-collection-want-unimpaired-p nil)
+
+  ;; I like to tweak bindings after loading pdf-tools
+  (require 'evil-collection)
+  (delete '(pdf pdf-view) evil-collection-mode-list)
+  (evil-collection-init))
+#+end_src
+
+** ~evil-escape~
+#+begin_src emacs-lisp
+(use-package evil-escape
+  :demand t
+  :init
+  (evil-escape-mode))
+#+end_src
+
+** ~general.el~
+#+begin_src emacs-lisp
+(use-package general
+  ;; :demand t
+  :after evil
+  :init
+  (general-evil-setup)
+
+  (general-create-definer aar/leader
+    :keymaps 'override
+    :states '(normal insert visual emacs)
+    :prefix "SPC"
+    :global-prefix "C-SPC")
+
+  (general-create-definer aar/localleader
+    :keymaps 'override
+    :states '(normal insert visual emacs)
+    :prefix "SPC m"
+    :global-prefix "C-SPC m")
+
+  (aar/localleader
+    "" '(nil :which-key "<localleader>"))
+
+  ;; Some basic <leader> keybindings
+  (aar/leader
+    ":" #'pp-eval-expression
+    ";" #'execute-extended-command
+    "&" #'async-shell-command
+    "u" #'universal-argument))
+#+end_src
+
+** Actual keybinding tweaks
+*** OSX Modifier keys
+#+begin_src emacs-lisp
+(when (eq system-type 'darwin)
+  (setq mac-command-modifier 'meta)
+  (setq mac-option-modifier 'option))
+#+end_src
+
+*** Basic Emacs bindings
+#+begin_src emacs-lisp
+;; Keybinding definitions
+;; Better escape
+(global-set-key (kbd "<escape>") #'keyboard-escape-quit)
+
+;; Text scale and zoom
+(global-set-key (kbd "C-+") #'text-scale-increase)
+(global-set-key (kbd "C-_") #'text-scale-decrease)
+(global-set-key (kbd "C-)") #'text-scale-adjust)
+
+;; Universal arguments with evil
+(global-set-key (kbd "C-M-u") 'universal-argument)
+#+end_src
+
+*** ~evil~ indentation
+#+begin_src emacs-lisp
+;; Visual indent/dedent
+;;;###autoload
+(defun aar/evil-visual-dedent ()
+  "Equivalent to vnoremap < <gv."
+  (interactive)
+  (evil-shift-left (region-beginning) (region-end))
+  (evil-normal-state)
+  (evil-visual-restore))
+
+;;;###autoload
+(defun aar/evil-visual-indent ()
+  "Equivalent to vnoremap > >gv."
+  (interactive)
+  (evil-shift-right (region-beginning) (region-end))
+  (evil-normal-state)
+  (evil-visual-restore))
+#+end_src
+
+*** ~evil~ jump to function/method definitions
+#+begin_src emacs-lisp
+;; Jumping to function and method definitions
+;;;###autoload
+(defun aar/next-beginning-of-method (count)
+  "Jump to the beginning of the COUNT-th method/function after point."
+  (interactive "p")
+  (beginning-of-defun (- count)))
+
+;;;###autoload
+(defun aar/previous-beginning-of-method (count)
+  "Jump to the beginning of the COUNT-th method/function before point."
+  (interactive "p")
+  (beginning-of-defun count))
+
+(defalias #'aar/next-end-of-method #'end-of-defun
+  "Jump to the end of the COUNT-th method/function after point.")
+
+;;;###autoload
+(defun aar/previous-end-of-method (count)
+  "Jump to the end of the COUNT-th method/function before point."
+  (interactive "p")
+  (end-of-defun (- count)))
+#+end_src
+
+* Test cases
+#+begin_src emacs-lisp
+(use-package vterm
+  :init
+  (setq vterm-always-compile-module t)
+  (setq vterm-buffer-name-string "vterm: %s")
+  (setq vterm-copy-exclude-prompt t)
+  (setq vterm-kill-buffer-on-exit t)
+  (setq vterm-max-scrollback 5000))
+
+(use-package pdf-tools
+  :hook
+  (pdf-tools-enabled . aar/pdf-h)
+  :init
+  (if (eq system-type 'darwin)
+      (progn
+        (setq pdf-view-use-scaling t)
+        (setq pdf-view-use-imagemagick nil)))
+
+  (pdf-loader-install)
+  :config
+  (evil-collection-pdf-setup)
+
+  (evil-collection-define-key '(normal visual motion) 'pdf-view-mode-map
+    (kbd "H")   #'image-bob
+    (kbd "J")   #'pdf-view-next-page-command
+    (kbd "K")   #'pdf-view-previous-page-command
+    (kbd "a")   #'pdf-view-fit-height-to-window
+    (kbd "s")   #'pdf-view-fit-width-to-window
+    (kbd "y")   #'pdf-view-kill-ring-save
+    (kbd "L")   #'image-eob
+    (kbd "o")   #'pdf-outline
+    (kbd "TAB") #'pdf-outline))
+#+end_src
+
+* Footer for init file
+#+BEGIN_SRC emacs-lisp
+(provide 'init)
+;;; init.el ends here
+#+END_SRC
+
+* Local variables
+# Local Variables:
+# eval: (add-hook 'after-save-hook #'org-babel-tangle nil t)
+# End:

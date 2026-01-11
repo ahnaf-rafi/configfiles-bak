@@ -10,6 +10,8 @@ source <(fzf --zsh)
 alias ll='eza -alhF --color=auto --group-directories-first'
 alias cat='bat'
 alias drs-mbaw='sudo darwin-rebuild switch --flake .#mb-air-work'
+alias emacsn='emacs --init-directory ~/.emacs.d-new/'
+alias emacsm='emacs --init-directory ~/.minimal.emacs.d/'
 
 # export FONTCONFIG_FILE=$(nix-build -E 'let pkgs = import <nixpkgs> { }; in pkgs.makeFontsConf { fontDirectories = [ pkgs.freefont_ttf ]; }')
 

@@ -61,10 +61,14 @@
         pkgs.automake
         pkgs.autoconf
         pkgs.autogen
+        pkgs.gcc
         pkgs.libgccjit
         pkgs.llvmPackages.clang
         pkgs.cctools
         pkgs.gnumake
+        pkgs.cmake
+        pkgs.libtool
+        pkgs.glibtool
         pkgs.libpng
         pkgs.zlib
         pkgs.brave
@@ -128,7 +132,8 @@
             #   g.tree-sitter-c
             #   g.tree-sitter-cpp
             # ])
-            epkgs.spell-fu
+            # epkgs.spell-fu
+            epkgs.jinx
             # epkgs.flyspell-lazy
             # epkgs.flyspell-correct
             epkgs.vterm
@@ -152,6 +157,7 @@
             epkgs.typst-ts-mode
             epkgs.typst-preview
             epkgs.websocket
+            epkgs.org
             epkgs.auctex
             epkgs.evil-tex
             epkgs.auctex-latexmk
@@ -194,7 +200,6 @@
         pkgs.sioyek
 
         pkgs.lynx
-
         pkgs.dbus
       ];
 
